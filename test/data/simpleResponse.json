@@ -1,0 +1,35 @@
+{
+ "responseHeader":{
+  "status":0,
+  "QTime":44,
+  "params":{
+	"indent":"off",
+	"start":"0",
+	"q":"*:*",
+	"wt":"json",
+	"version":"2.2",
+	"rows":"10"}},
+ "response":
+  {
+   "numFound":1,
+   "start":0,
+   "docs":[
+           {
+            "uid":"foo-1",
+            "doc_type":"foo",
+            "id":"1",
+	    "field_one_str":"one",
+	    "field_two_int":2,
+	    "timestamp":"2010-12-09T22:45:38.477Z"
+           },
+           {
+            "uid":"foo-2",
+            "doc_type":"foo",
+            "id":"2",
+	    "field_one_str":"two",
+	    "field_two_int":3,
+	    "timestamp":"2010-12-09T22:45:38.477Z"
+           }
+          ]
+  }
+}

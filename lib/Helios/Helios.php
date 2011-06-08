@@ -32,12 +32,6 @@
 
 namespace Helios;
 
-//require_once dirname( __FILE__ ) . '/vendor/SolrPhpClient/Apache/Solr/Service/Balancer.php';
-//require_once dirname( __FILE__ ) . '/vendor/sfYaml/lib/sfYaml.php';
-
-//spl_autoload_register( array( 'Helios', 'autoload' ) );
-
-
 class Helios
 {
     const UID_FIELD_NAME = 'uid';
@@ -53,12 +47,19 @@ class Helios
 
     /**
      *
-     * @param string $configPath
+     * @param string $config
      */
-    static public function configure( $configPath )
+    static public function configure( $config )
     {
-        self::$heliosConfig = new Config;
-        self::$heliosConfig->load( $configPath );
+        if ( $config instanceOf Config )
+        {
+            self::$heliosConfig = $config;
+        }
+        else
+        {
+            self::$heliosConfig = new Config;
+            self::$heliosConfig->load( $config );
+        }
 
         return true;
     }

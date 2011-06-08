@@ -30,7 +30,9 @@
  *
  */
 
-class Helios_Config implements ArrayAccess
+namespace Helios;
+
+class Config implements \ArrayAccess
 {
     /**
      * @var array
@@ -47,21 +49,21 @@ class Helios_Config implements ArrayAccess
 
     /**
      * Uses sfYaml to load and parse a yaml file into Helios_Config::config
-     * 
+     *
      * @param string $yamlPath
      */
     public function load( $yamlPath )
     {
-        $this->config = sfYaml::load( $yamlPath );
+        $this->config = \sfYaml::load( $yamlPath );
 
-        if ( !is_array( $this->config ) ) throw new Helios_Exception( 'Could not load config' );
+        if ( !is_array( $this->config ) ) throw new Exception( 'Could not load config' );
 
         $this->sanitize( );
     }
 
     /**
      * checks config is loaded
-     * 
+     *
      * @return bool
      */
     public function isLoaded( )
@@ -77,29 +79,29 @@ class Helios_Config implements ArrayAccess
     public function sanitize( )
     {
         // check loaded
-        if ( !$this->isLoaded( ) ) throw new Helios_Exception( 'Configuration not loaded' );
+        if ( !$this->isLoaded( ) ) throw new Exception( 'Configuration not loaded' );
 
         // check servers
-        if ( !isset( $this->config[ 'servers' ] ) ) throw new Helios_Exception( 'Servers not found in config' );
+        if ( !isset( $this->config[ 'servers' ] ) ) throw new Exception( 'Servers not found in config' );
 
         if ( !is_array( $this->config[ 'servers' ][ 'readable' ] ) )
         {
-            throw new Helios_Exception( 'Readable servers not found in config' );
+            throw new Exception( 'Readable servers not found in config' );
         }
 
         if ( !is_array( $this->config[ 'servers' ][ 'writable' ] ) )
         {
-            throw new Helios_Exception( 'Writable servers not found in config' );
+            throw new Exception( 'Writable servers not found in config' );
         }
 
         if ( count( $this->config[ 'servers' ][ 'readable' ] ) === 0 )
         {
-            throw new Helios_Exception( 'There must be at least one readable server' );
+            throw new Exception( 'There must be at least one readable server' );
         }
 
         if ( count( $this->config[ 'servers' ][ 'writable' ] ) === 0 )
         {
-            throw new Helios_Exception( 'There must be at least one writable server' );
+            throw new Exception( 'There must be at least one writable server' );
         }
 
         return true;
@@ -113,7 +115,7 @@ class Helios_Config implements ArrayAccess
      */
     public function offsetSet( $offset, $value )
     {
-        throw new Helios_Exception( 'Setting of configuration values at runtime is not allowed, sorry' );
+        throw new Exception( 'Setting of configuration values at runtime is not allowed, sorry' );
     }
 
     /**
@@ -123,7 +125,7 @@ class Helios_Config implements ArrayAccess
      */
     public function offsetUnset( $offset )
     {
-        throw new Helios_Exception( 'Setting of configuration values at runtime is not allowed, sorry' );
+        throw new Exception( 'Setting of configuration values at runtime is not allowed, sorry' );
     }
 
     /**

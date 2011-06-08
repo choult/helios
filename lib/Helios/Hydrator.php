@@ -30,18 +30,19 @@
  *
  */
 
+namespace Helios;
 
-class Helios_Hydrator
+class Hydrator
 {
     /**
      *
      * @param Helios_Request $request
      * @param Apache_Solr_Response $response
-     * @return Helios_Collection 
+     * @return Helios_Collection
      */
-    public function hydrate( Helios_Request $request, Apache_Solr_Response $response )
+    public function hydrate( Request $request, \Apache_Solr_Response $response )
     {
-        $collection = new Helios_Collection( );
+        $collection = new Collection( );
 
 
         // hydrate documents
@@ -51,7 +52,7 @@ class Helios_Hydrator
         {
             foreach ( $payload->docs as $doc )
             {
-                $documents[ ] = new Helios_Document( (array) $doc );
+                $documents[ ] = new Document( (array) $doc );
             }
 
             $collection->setDocuments( $documents );
@@ -112,13 +113,13 @@ class Helios_Hydrator
 
     public function hydrateFacet( $name, array $list )
     {
-        $facet = new Helios_Facet( );
+        $facet = new Facet( );
 
         $facet->setName( $name );
 
         for ( $i = 0, $j = count( $list ); $i < $j; $i += 2 )
         {
-            $tag = new Helios_Tag( );
+            $tag = new Tag( );
 
             $tag->setName( $list[ $i ] );
             $tag->setTally( $list[ $i + 1 ] );

@@ -30,7 +30,9 @@
  *
  */
 
-class Helios_Connection
+namespace Helios;
+
+class Connection
 {
     /**
      * @var Helios_Connection instance
@@ -64,7 +66,7 @@ class Helios_Connection
     {
         if ( !isset( self::$instance ) )
         {
-            self::$instance = new Helios_Connection( );
+            self::$instance = new Connection( );
         }
 
         return self::$instance;
@@ -79,15 +81,15 @@ class Helios_Connection
 
         foreach ( $servers[ 'readable' ] as $server )
         {
-            $readableServices[ ] = new Apache_Solr_Service( $server[ 'host' ], $server[ 'port' ], $server[ 'path' ] );
+            $readableServices[ ] = new \Apache_Solr_Service( $server[ 'host' ], $server[ 'port' ], $server[ 'path' ] );
         }
 
         foreach ( $servers[ 'writable' ] as $server )
         {
-            $writeableServices[ ] = new Apache_Solr_Service( $server[ 'host' ], $server[ 'port' ], $server[ 'path' ] );
+            $writeableServices[ ] = new \Apache_Solr_Service( $server[ 'host' ], $server[ 'port' ], $server[ 'path' ] );
         }
 
-        $this->service = new Apache_Solr_Service_Balancer( $readableServices, $writeableServices );
+        $this->service = new \Apache_Solr_Service_Balancer( $readableServices, $writeableServices );
 
         return true;
     }

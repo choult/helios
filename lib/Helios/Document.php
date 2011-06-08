@@ -30,9 +30,10 @@
  *
  */
 
-require_once 'Helios.php';
+namespace Helios;
 
-class Helios_Document extends Apache_Solr_Document implements ArrayAccess
+//require_once dirname( __FILE__ ) . '/vendor/SolrPhpClient/Apache/Solr/Service/Balancer.php';
+class Document extends \Apache_Solr_Document implements \ArrayAccess
 {
     /**
      * container for facets
@@ -50,10 +51,10 @@ class Helios_Document extends Apache_Solr_Document implements ArrayAccess
         $this->clear( );
 
         if ( !isset( $fields[ Helios::ID_FIELD_NAME ] ) )
-            throw new Helios_Exception( 'Document id not found' );
+            throw new Exception( 'Document id not found' );
 
         if ( !isset( $fields[ Helios::TYPE_FIELD_NAME ] ) )
-            throw new Helios_Exception( 'Document type not found' );
+            throw new Exception( 'Document type not found' );
 
         $this->_fields = $fields;
 

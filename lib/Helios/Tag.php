@@ -30,23 +30,79 @@
  *
  */
 
-require_once 'Helios.php';
+namespace Helios;
 
-class Helios_Aspect
+class Tag
 {
     /**
-     * Source of the facet data (i.e. field, query, date)
+     * identifier for this tag
      * @var string
      */
-    private $source;
+    private $ident;
 
     /**
-     * Friendly name for the source
+     * tag id
+     * @var int
+     */
+    private $id;
+
+    /**
+     * tag name
      * @var string
      */
-    private $alias;
+    private $name;
 
+    /**
+     * tag tally
+     * @var int
+     */
+    private $tally;
+
+
+
+
+
+
+
+    public function getIdent( )
+    {
+        return $this->ident;
+    }
+
+    public function setIdent( $ident )
+    {
+        $this->ident = $ident;
+    }
+
+    public function getId( )
+    {
+        return $this->id;
+    }
+
+    public function setId( $id )
+    {
+        $this->id = $id;
+    }
+
+    public function getName( )
+    {
+        return $this->name;
+    }
+
+    public function setName( $name )
+    {
+        $this->name = $name;
+    }
+
+    public function getTally( )
+    {
+        return $this->tally;
+    }
+
+    public function setTally( $tally )
+    {
+        $this->tally = $tally;
+    }
 
 
 }
-

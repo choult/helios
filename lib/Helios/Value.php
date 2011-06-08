@@ -29,8 +29,9 @@
  * @version 0.1
  *
  */
+namespace Helios;
 
-class Helios_Value extends Exception
+class Value extends Exception
 {
 
     /**
@@ -47,7 +48,7 @@ class Helios_Value extends Exception
     private $fuzz;
 
     /**
-     * 
+     *
      */
     public function __construct( $value )
     {

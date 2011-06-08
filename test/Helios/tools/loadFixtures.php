@@ -1,5 +1,5 @@
 <?php
-require_once dirname( __FILE__ ) . '/../../lib/vendor/SolrPhpClient/Apache/Solr/Service.php';
+require_once dirname( __FILE__ ) . '/../../../lib/vendor/SolrPhpClient/Apache/Solr/Service.php';
 
 $server = 'orchid';
 $port   = 8983;

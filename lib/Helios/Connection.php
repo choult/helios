@@ -52,7 +52,7 @@ class Connection
     /**
      *
      */
-    private function __construct( )
+    public function __construct( )
     {
         // init auto commit
         $this->autoCommit = false;

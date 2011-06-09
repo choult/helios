@@ -38,7 +38,10 @@
  *  -
  *
  */
-class Helios_Collection implements IteratorAggregate, Countable, ArrayAccess
+
+namespace Helios;
+
+class Collection implements \IteratorAggregate, \Countable, \ArrayAccess
 {
 
     /**
@@ -63,7 +66,7 @@ class Helios_Collection implements IteratorAggregate, Countable, ArrayAccess
     private $facetFields;
 
     /**
-     * @var array 
+     * @var array
      */
     private $facetQueries;
 
@@ -72,7 +75,7 @@ class Helios_Collection implements IteratorAggregate, Countable, ArrayAccess
      */
     private $facetDates;
 
-    
+
 
 
 
@@ -89,7 +92,7 @@ class Helios_Collection implements IteratorAggregate, Countable, ArrayAccess
      *
      * @param Helios_Request $query
      */
-    public function setRequest( Helios_Request $request )
+    public function setRequest( Request $request )
     {
         $this->request = clone $request;
     }
@@ -107,7 +110,7 @@ class Helios_Collection implements IteratorAggregate, Countable, ArrayAccess
      *
      * @param Apache_Solr_Response $response
      */
-    public function setResponse( Apache_Solr_Response $response )
+    public function setResponse( \Apache_Solr_Response $response )
     {
         $this->response = $response;
     }
@@ -190,7 +193,7 @@ class Helios_Collection implements IteratorAggregate, Countable, ArrayAccess
      */
     public function getIterator( )
     {
-        return new ArrayIterator( (array) $this->documents );
+        return new \ArrayIterator( (array) $this->documents );
     }
 
     /**

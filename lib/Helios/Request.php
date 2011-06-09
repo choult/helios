@@ -30,9 +30,9 @@
  *
  */
 
-require_once 'Helios.php';
+namespace Helios;
 
-class Helios_Request
+class Request
 {
     /**
      * @var string
@@ -52,23 +52,23 @@ class Helios_Request
      */
     public function execute( $offset = 0, $limit = 10 )
     {
-        $hydrator = new Helios_Hydrator( );
+        $hydrator = new Hydrator( );
 
         $params = array( );
 
         // check for query before passing to Apache lib
-        if ( empty( $this->query ) ) throw new Helios_Exception( 'Query not defined' );
-        
-        // Helios uses it's own documents so turn this off
-        Helios_Connection::getService( )->setCreateDocuments( false );
+        if ( empty( $this->query ) ) throw new Exception( 'Query not defined' );
 
-        $response = Helios_Connection::getService( )->search( $this->query, $offset, $limit, $this->params );
+        // Helios uses it's own documents so turn this off
+        Connection::getService( )->setCreateDocuments( false );
+
+        $response = Connection::getService( )->search( $this->query, $offset, $limit, $this->params );
 
         $collection = $hydrator->hydrate( $this, $response );
 
         return $collection;
     }
-    
+
     /**
      *
      * @return string
@@ -85,7 +85,7 @@ class Helios_Request
     public function setQuery( $query )
     {
         if ( !is_string( $query ) )
-            throw new Helios_Exception( 'Query must be a string, ' . gettype( $query ) . ' given' );
+            throw new Exception( 'Query must be a string, ' . gettype( $query ) . ' given' );
 
         $this->query = $query;
     }
@@ -106,7 +106,7 @@ class Helios_Request
     public function setParams( $params )
     {
         if ( !is_array( $params ) )
-            throw new Helios_Exception( 'Params must be an array, ' . gettype( $params ) . ' given' );
+            throw new Exception( 'Params must be an array, ' . gettype( $params ) . ' given' );
 
         $this->params = $params;
     }

@@ -30,7 +30,9 @@
  *
  */
 
-class Helios_Exception extends Exception
+namespace Helios;
+
+class Exception extends \Exception
 {
-    
+
 }

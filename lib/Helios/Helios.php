@@ -30,11 +30,7 @@
  *
  */
 
-require_once dirname( __FILE__ ) . '/vendor/SolrPhpClient/Apache/Solr/Service/Balancer.php';
-require_once dirname( __FILE__ ) . '/vendor/sfYaml/lib/sfYaml.php';
-
-spl_autoload_register( array( 'Helios', 'autoload' ) );
-
+namespace Helios;
 
 class Helios
 {
@@ -51,12 +47,19 @@ class Helios
 
     /**
      *
-     * @param string $configPath
+     * @param string $config
      */
-    static public function configure( $configPath )
+    static public function configure( $config )
     {
-        self::$heliosConfig = new Helios_Config;
-        self::$heliosConfig->load( $configPath );
+        if ( $config instanceOf Config )
+        {
+            self::$heliosConfig = $config;
+        }
+        else
+        {
+            self::$heliosConfig = new Config;
+            self::$heliosConfig->load( $config );
+        }
 
         return true;
     }
@@ -66,9 +69,9 @@ class Helios
      */
     static public function config( $section = null )
     {
-        if ( !self::$heliosConfig instanceof Helios_Config )
+        if ( !self::$heliosConfig instanceof Config )
         {
-            throw new Helios_Exception( 'Configuration not loaded' );
+            throw new Exception( 'Configuration not loaded' );
         }
 
         return ( $section !== null ) ? self::$heliosConfig[ $section ] : self::$heliosConfig;

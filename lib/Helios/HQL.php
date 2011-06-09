@@ -30,9 +30,9 @@
  *
  */
 
-require_once 'Helios.php';
+namespace Helios;
 
-class Helios_HQL
+class HQL
 {
     /**
      * $q->from( 'Films, Features, Articles' )
@@ -148,7 +148,7 @@ class Helios_HQL
         preg_match_all( '/\?/', $where, $matches );
 
         if ( count( $matches[ 0 ] ) != count( $params ) )
-            throw new Helios_Exception( 'Too many/few parameters' );
+            throw new Exception( 'Too many/few parameters' );
 
         // replace not between
         $where = preg_replace( '/([\w\d-_]*)\s?NOT BETWEEN\s?\? AND \?/', '(*:* -$1:[? TO ?])', $where );
@@ -169,7 +169,7 @@ class Helios_HQL
             $where = preg_replace( '/\?/', $param, $where, 1 );
         }
 
-        
+
         $this->where[ ] = '(' . $where . ')';
     }
 
@@ -199,7 +199,7 @@ class Helios_HQL
 
     /**
      *
-     * @param string $fields 
+     * @param string $fields
      */
     public function facetOn( $fields )
     {
@@ -281,7 +281,7 @@ class Helios_HQL
 
             $params[ 'facet.field' ][ ] = $this->facet;
         }
-        
+
         return $params;
     }
 
@@ -293,7 +293,7 @@ class Helios_HQL
      */
     public function execute( $offset = 0, $limit = 10 )
     {
-        $req = new Helios_Request( );
+        $req = new Request( );
 
         $req->setQuery( $this->build( ) );
 
@@ -311,7 +311,7 @@ class Helios_HQL
      */
     static public function escape( $value )
     {
-        return Apache_Solr_Service::escape( $value );
+        return \Apache_Solr_Service::escape( $value );
     }
 
     /**

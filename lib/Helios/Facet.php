@@ -30,9 +30,9 @@
  *
  */
 
-require_once 'Helios.php';
+namespace Helios;
 
-class Helios_Facet implements IteratorAggregate, Countable, ArrayAccess
+class Facet implements \IteratorAggregate, \Countable, \ArrayAccess
 {
     /**
      * @var string
@@ -51,7 +51,7 @@ class Helios_Facet implements IteratorAggregate, Countable, ArrayAccess
 
 
     /**
-     * 
+     *
      */
     public function addTag( Helios_Tag $tag )
     {

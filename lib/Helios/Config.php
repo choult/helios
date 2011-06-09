@@ -37,7 +37,7 @@ class Config implements \ArrayAccess
     /**
      * @var array
      */
-    private $config;
+    protected $config;
 
     /**
      *

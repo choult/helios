@@ -50,12 +50,39 @@ class Connection
     private $autoCommit;
 
     /**
+     * @var Config config
+     */
+    private $config;
+
+    /**
      *
      */
-    public function __construct( )
+    public function __construct( Config $config = null, $autoCommit = false )
     {
+        $this->setConfig( $config );
+
         // init auto commit
-        $this->autoCommit = false;
+        $this->autoCommit = $autoCommit;
+    }
+
+    /**
+     * Returns the Config for this Connection, statically if not set
+     *
+     * @return Config
+     */
+    public function getConfig()
+    {
+        return ( $this->config !== null ) ? $this->config : Helios::config();
+    }
+
+    /**
+     * Sets the Config for this Connection
+     *
+     * @param Config $config
+     */
+    public function setConfig( Config $config = null )
+    {
+        $this->config = $config;
     }
 
     /**
@@ -77,7 +104,8 @@ class Connection
      */
     public function initialize( )
     {
-        $servers = Helios::config( 'servers' );
+        $config = $this->getConfig();
+        $servers = $config[ 'servers' ];
 
         foreach ( $servers[ 'readable' ] as $server )
         {

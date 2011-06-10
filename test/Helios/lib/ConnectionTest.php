@@ -3,7 +3,8 @@
 namespace Helios\Test;
 
 use     Helios\Helios,
-        Helios\Connection;
+        Helios\Connection,
+        Helios\Config;
 
 /**
  * Test class for Helios_Connection.
@@ -42,6 +43,27 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
     public function testGetInstance( )
     {
         $this->assertTrue( Connection::getInstance( ) instanceof Connection );
+    }
+
+    /**
+     *
+     */
+    public function testGetConfig( )
+    {
+        $config = new Config();
+        $connection = new Connection( $config );
+        $this->assertEquals( $config, $connection->getConfig() );
+    }
+
+    /**
+     *
+     */
+    public function testSetConfig( )
+    {
+        $connection = new Connection();
+        $config = new Config();
+        $connection->setConfig( $config );
+        $this->assertEquals( $config, $connection->getConfig() );
     }
 
     /**

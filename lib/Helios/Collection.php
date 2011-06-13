@@ -254,7 +254,7 @@ class Collection implements \IteratorAggregate, \Countable, \ArrayAccess
         if( null === $this->getRequest() ) return null;
 
         $limit = $this->getRequest()->getLimit( );
-        $totalResults = $this->resultsCount();
+        $totalResults = $this->getRecordsFound();
 
         return ceil( $totalResults / $limit );
     }

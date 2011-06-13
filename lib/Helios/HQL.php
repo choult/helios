@@ -172,7 +172,7 @@ class HQL
         $where = preg_replace( '/([\w\d-_]*)\s?NOT BETWEEN\s?\? AND \?/', '(*:* -$1:[? TO ?])', $where );
 
         // replace between
-        $where = preg_replace( '/([\w\d-_]*)\s?BETWEEN\s?\? AND \?/', '$1:["?" TO ?]', $where );
+        $where = preg_replace( '/([\w\d-_]*)\s?BETWEEN\s?\? AND \?/', '$1:[? TO ?]', $where );
 
         // replace not equal
         $where = preg_replace( '/([\w\d-_]*)\s?!=\s?\?/', '(*:* -$1:"?")', $where );

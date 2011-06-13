@@ -181,4 +181,22 @@ class HQLTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals( '\:', HQL::escape( ':' ) );
         $this->assertEquals( '\\\\', HQL::escape( '\\' ) );
     }
+
+    /**
+     *
+     */
+    public function testPaginationSetpage()
+    {
+        // SetCurrentPage only calculate Offset and getCurrentPage calculated from offset/limit
+        $this->object->setMaxResults( 10 );
+        $this->object->setCurrentPage( 2 );
+
+        $this->assertEquals( 2, $this->object->getCurrentPage() );
+        $this->assertEquals( 10, $this->object->getMaxResults() );
+        $this->assertEquals( 10, $this->object->getFirstResult() );
+
+        // change Page by setting offset
+        $this->object->setFirstResult( 30 ); // == Page 4
+        $this->assertEquals( 4, $this->object->getCurrentPage() );
+    }
 }

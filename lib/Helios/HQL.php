@@ -402,4 +402,34 @@ class HQL
         return $this->limit;
     }
 
+    /**
+     * Set result offset based on page number
+     *
+     * @param integer $page
+     */
+    public function setCurrentPage( $page )
+    {
+        if( !is_numeric( $page ) )
+        {
+            throw new \Exception( 'setCurrentPage expects $page argument Type Integer' );
+        }
+
+        $page = ( $page > 1 ) ? $page : 1 ;
+
+        // calculate Offset
+        $this->offset = ( $page * $this->getMaxResults() ) - $this->getMaxResults();
+    }
+
+    /**
+     * Get caculated Current page based on ( offset / Limit )
+     * 
+     * @return integer
+     */
+    public function getCurrentPage( )
+    {
+        $page = ceil( $this->getFirstResult() / $this->getMaxResults() ) + 1;
+
+        return ( $page > 0 ) ? $page : 1 ;
+    }
+
 }

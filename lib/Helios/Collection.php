@@ -46,7 +46,7 @@ class Collection implements \IteratorAggregate, \Countable, \ArrayAccess
 
     /**
      * A clone of the request that created this collection
-     * @var Helios_Request
+     * @var Request
      */
     private $request;
 
@@ -243,6 +243,40 @@ class Collection implements \IteratorAggregate, \Countable, \ArrayAccess
     public function offsetUnset( $key )
     {
         unset( $this->documents[ $key ] );
+    }
+
+    /**
+     * Pagination: Get total pages
+     * @return integer|null
+     */
+    public function getPageSize( )
+    {
+        if( null === $this->getRequest() ) return null;
+
+        $limit = $this->getRequest()->getLimit( );
+        $totalResults = $this->resultsCount();
+
+        return ceil( $totalResults / $limit );
+    }
+
+    /**
+     * Pagination: Get current page
+     * @return integer|null
+     */
+    public function getCurrentPage( )
+    {
+        if( null === $this->getRequest() ) return null;
+
+        return ( $this->getRequest()->getOffset( ) / $this->getRequest()->getLimit( ) );
+    }
+
+    /**
+     * Pagibnation: Get Total results count
+     * @return integer
+     */
+    public function resultsCount( )
+    {
+        return 10; // @TODO: Have to work on this part
     }
 
 }

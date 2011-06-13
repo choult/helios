@@ -45,12 +45,22 @@ class Request
     private $params = array( );
 
     /**
+     * @var integer
+     */
+    private $offset = 0;
+
+    /**
+     * @var integer
+     */
+    private $limit = 10;
+
+    /**
      * Execute query, create collection
      *
      * @param int $offset
      * @param int $limit
      */
-    public function execute( $offset = 0, $limit = 10 )
+    public function execute( )
     {
         $hydrator = new Hydrator( );
 
@@ -62,7 +72,7 @@ class Request
         // Helios uses it's own documents so turn this off
         Connection::getService( )->setCreateDocuments( false );
 
-        $response = Connection::getService( )->search( $this->query, $offset, $limit, $this->params );
+        $response = Connection::getService( )->search( $this->getQuery(), $this->getOffset(), $this->getLimit(), $this->getParams() );
 
         $collection = $hydrator->hydrate( $this, $response );
 
@@ -111,5 +121,44 @@ class Request
         $this->params = $params;
     }
 
+    /**
+     *  Get Results limit
+     *
+     * @return integer
+     */
+    public function getLimit( )
+    {
+        return $this->limit;
+    }
+
+    /**
+     *  Get Result offset
+     *
+     * @return integer
+     */
+    public function getOffset( )
+    {
+        return $this->offset;
+    }
+
+    /**
+     * Set result offset
+     *
+     * @param integer $offset
+     */
+    public function setOffset( $offset )
+    {
+        $this->offset = $offset;
+    }
+
+    /**
+     * Set result limit
+     *
+     * @param integer $limit
+     */
+    public function setLimit( $limit )
+    {
+        $this->limit = $limit;
+    }
 
 }

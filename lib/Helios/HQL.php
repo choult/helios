@@ -66,7 +66,25 @@ class HQL
      */
     private $facet;
 
+    /**
+     * @var integer
+     */
+    private $offset;
 
+    /**
+     * @var integer
+     */
+    private $limit;
+
+    /**
+     * Constructor
+     */
+    public function __construct( )
+    {
+        // set Default offset / limit
+        $this->offset = 0;
+        $this->limit = 10;
+    }
 
 
     /**
@@ -286,12 +304,10 @@ class HQL
     }
 
     /**
-     *
-     * @param int $offset
-     * @param int $limit
-     * @return Helios_Collection
+     * Execute this HQL query
+     * @return Collection
      */
-    public function execute( $offset = 0, $limit = 10 )
+    public function execute( )
     {
         $req = new Request( );
 
@@ -299,7 +315,11 @@ class HQL
 
         $req->setParams( $this->params( ) );
 
-        return $req->execute( $offset, $limit );
+        $req->setOffset( $this->getFirstResult() );
+
+        $req->setLimit( $this->getMaxresults() );
+        
+        return $req->execute( );
     }
 
     /**
@@ -328,8 +348,54 @@ class HQL
         return $bits;
     }
 
+    /**
+     * Set results offset
+     *
+     * @param integer $offset
+     */
+    public function setFirstResult( $offset )
+    {
+        if( !is_numeric( $offset ) )
+        {
+            throw new \Exception( 'setFirstResult expects $offset to be an integer value' );
+        }
 
+        $this->offset = $offset;
+    }
 
+    /**
+     * Retrieve results offset
+     *
+     * @return integer
+     */
+    public function getFirstResult( )
+    {
+        return $this->offset;
+    }
 
+    /**
+     * Set results limit
+     *
+     * @param integer $limit
+     */
+    public function setMaxResults( $limit )
+    {
+        if( !is_numeric( $limit ) )
+        {
+            throw new \Exception( 'setMaxResults expects $limit to be an integer value' );
+        }
+
+        $this->limit = $limit;
+    }
+
+    /**
+     * Retrieve results limit
+     *
+     * @return integer
+     */
+    public function getMaxresults()
+    {
+        return $this->limit;
+    }
 
 }

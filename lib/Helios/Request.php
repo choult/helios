@@ -148,6 +148,11 @@ class Request
      */
     public function setOffset( $offset )
     {
+        if( !is_numeric( $offset ) )
+        {
+            throw new \Exception( 'setCurrentPage expects $offset argument Type Integer' );
+        }
+
         $this->offset = $offset;
     }
 
@@ -158,7 +163,41 @@ class Request
      */
     public function setLimit( $limit )
     {
+        if( !is_numeric( $limit ) )
+        {
+            throw new \Exception( 'setCurrentPage expects $limit argument Type Integer' );
+        }
+
         $this->limit = $limit;
+    }
+
+    /**
+     * Set result offset based on page number
+     *
+     * @param integer $page
+     */
+    public function setCurrentPage( $page )
+    {
+        if( !is_numeric( $page ) )
+        {
+            throw new \Exception( 'setCurrentPage expects $page argument Type Integer' );
+        }
+
+        $page = ( $page > 1 ) ? $page : 1 ;
+
+        // calculate Offset
+        $this->offset = ( $page * $this->getLimit() ) - $this->getLimit();
+    }
+
+    /**
+     * Get caculated Current page based on ( offset / Limit )
+     * @return integer
+     */
+    public function getCurrentPage( )
+    {
+        $page = ceil( $this->getOffset() / $this->getLimit() ) + 1;
+
+        return ( $page > 0 ) ? $page : 1 ;
     }
 
 }

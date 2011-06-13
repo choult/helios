@@ -397,7 +397,7 @@ class HQL
      *
      * @return integer
      */
-    public function getMaxresults()
+    public function getMaxResults()
     {
         return $this->limit;
     }

@@ -28,7 +28,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
 
         $rawResponse = file_get_contents( dirname(__FILE__) . '/../data/simpleResponse.json' );
 
-        $this->response = new \Apache_Solr_Response( $rawResponse, array( 'HTTP/1.0 200 OK', 'Content-Type: text/plain; charset=UTF-8' ), false );
+        $this->response = new \Apache_Solr_Response( new \Apache_Solr_HttpTransport_Response( 200, 'Content-Type: text/plain; charset=UTF-8', $rawResponse ), false  );
     }
 
     /**

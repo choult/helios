@@ -98,24 +98,24 @@ class HQLTest extends \PHPUnit_Framework_TestCase
     public function testWhere()
     {
         $this->object->where( 'foo = ?', 'value' );
-        $this->assertEquals( '(foo:value)', $this->object->build( ) );
+        $this->assertEquals( '(foo:"value")', $this->object->build( ) );
 
         $this->object->where( 'foo = ? AND bar = ?', array( 1, 2 ) );
-        $this->assertEquals( '(foo:1 AND bar:2)', $this->object->build( ) );
+        $this->assertEquals( '(foo:"1" AND bar:"2")', $this->object->build( ) );
 
         $this->object->where( 'foo = ? OR bar = ?', array( 1, 2 ) );
-        $this->assertEquals( '(foo:1 OR bar:2)', $this->object->build( ) );
+        $this->assertEquals( '(foo:"1" OR bar:"2")', $this->object->build( ) );
 
         $this->object->where( 'bar != ?', array( 1 ) );
-        $this->assertEquals( '((*:* -bar:1))', $this->object->build( ) );
+        $this->assertEquals( '((*:* -bar:"1"))', $this->object->build( ) );
 
         $this->object->where( 'foo = ?', 'value1' );
         $this->object->orWhere( 'bar = ?', 'value2' );
-        $this->assertEquals( '(foo:value1) OR (bar:value2)', $this->object->build( ) );
+        $this->assertEquals( '(foo:"value1") OR (bar:"value2")', $this->object->build( ) );
 
         $this->object->where( 'foo = ?', 'value1' );
         $this->object->andWhere( 'bar = ?', 'value2' );
-        $this->assertEquals( '(foo:value1) AND (bar:value2)', $this->object->build( ) );
+        $this->assertEquals( '(foo:"value1") AND (bar:"value2")', $this->object->build( ) );
 
         $this->object->where( 'foo BETWEEN ? AND ?', array( 10, 20 ) );
         $this->assertEquals( '(foo:[10 TO 20])', $this->object->build( ) );
@@ -131,7 +131,7 @@ class HQLTest extends \PHPUnit_Framework_TestCase
     {
         $this->object->where( 'foo = ?', 'value1' );
         $this->object->andWhere( 'bar = ?', 'value2' );
-        $this->assertEquals( '(foo:value1) AND (bar:value2)', $this->object->build( ) );
+        $this->assertEquals( '(foo:"value1") AND (bar:"value2")', $this->object->build( ) );
     }
 
     /**
@@ -141,7 +141,7 @@ class HQLTest extends \PHPUnit_Framework_TestCase
     {
         $this->object->where( 'foo = ?', 'value1' );
         $this->object->orWhere( 'bar = ?', 'value2' );
-        $this->assertEquals( '(foo:value1) OR (bar:value2)', $this->object->build( ) );
+        $this->assertEquals( '(foo:"value1") OR (bar:"value2")', $this->object->build( ) );
     }
 
     /**

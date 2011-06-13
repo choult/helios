@@ -172,19 +172,19 @@ class HQL
         $where = preg_replace( '/([\w\d-_]*)\s?NOT BETWEEN\s?\? AND \?/', '(*:* -$1:[? TO ?])', $where );
 
         // replace between
-        $where = preg_replace( '/([\w\d-_]*)\s?BETWEEN\s?\? AND \?/', '$1:[? TO ?]', $where );
+        $where = preg_replace( '/([\w\d-_]*)\s?BETWEEN\s?\? AND \?/', '$1:["?" TO ?]', $where );
 
         // replace not equal
-        $where = preg_replace( '/([\w\d-_]*)\s?!=\s?\?/', '(*:* -$1:?)', $where );
+        $where = preg_replace( '/([\w\d-_]*)\s?!=\s?\?/', '(*:* -$1:"?")', $where );
 
         // replace equal
-        $where = preg_replace( '/([\w\d-_]*)\s?=\s?\?/', '$1:?', $where );
+        $where = preg_replace( '/([\w\d-_]*)\s?=\s?\?/', '$1:"?"', $where );
 
 
         // relace placeholders
         foreach ( $params as $param )
         {
-            $where = preg_replace( '/\?/', $param, $where, 1 );
+            $where = preg_replace( '/\?/', self::escape( $param ), $where, 1 );
         }
 
 
@@ -261,9 +261,13 @@ class HQL
         // build where conditions
         if ( count( $this->where ) > 0 )
         {
+            if( trim( $query ) != '' )
+            {
+                $query .= ' AND '; // require when merging FROM & WHERE, they are same in SOLR query
+            }
+
             $query .= implode( ' ', $this->where );
         }
-
 
         return $query;
     }
@@ -318,7 +322,7 @@ class HQL
         $req->setOffset( $this->getFirstResult() );
 
         $req->setLimit( $this->getMaxresults() );
-        
+
         return $req->execute( );
     }
 

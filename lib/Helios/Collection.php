@@ -274,9 +274,9 @@ class Collection implements \IteratorAggregate, \Countable, \ArrayAccess
      * Pagibnation: Get Total results count
      * @return integer
      */
-    public function resultsCount( )
+    public function getRecordsFound( )
     {
-        return 10; // @TODO: Have to work on this part
+        return isset( $this->getResponse()->response->numFound ) ? intval( $this->getResponse()->response->numFound ) : 0;
     }
 
 }

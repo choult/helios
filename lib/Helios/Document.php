@@ -173,4 +173,20 @@ class Document extends \Apache_Solr_Document implements \ArrayAccess
         unset( $this->_fields[ $key ] );
     }
 
+    /**
+     * Return fields as Array key => value pair
+     * @return array
+     */
+    public function toArray()
+    {
+        $document = array();
+        
+        foreach( $this->_fields as $key => $value )
+        {
+            $document[ $key ] = $value;
+        }
+
+        return $document;
+    }
+
 }

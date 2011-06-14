@@ -246,28 +246,42 @@ class Collection implements \IteratorAggregate, \Countable, \ArrayAccess
     }
 
     /**
-     * Pagination: Get total pages
-     * @return integer|null
+     * Pagination: Get result limit
+     * @return integer
      */
     public function getPageSize( )
     {
-        if( null === $this->getRequest() ) return null;
+        if( null === $this->getRequest() ) return 0;
 
-        $limit = $this->getRequest()->getLimit( );
-        $totalResults = $this->getRecordsFound();
-
-        return ceil( $totalResults / $limit );
+        return $this->getRequest()->getLimit( );
     }
 
     /**
      * Pagination: Get current page
-     * @return integer|null
+     * @return integer
      */
     public function getCurrentPage( )
     {
         if( null === $this->getRequest() ) return null;
 
-        return ( $this->getRequest()->getOffset( ) / $this->getRequest()->getLimit( ) );
+        $page = ( $this->getRequest()->getOffset( ) / $this->getRequest()->getLimit( ) ) + 1;
+
+        return ( $page > 0 ) ? $page : 1;
+    }
+
+    /**
+     * Get Total pages
+     *
+     * @return integer
+     */
+    public function getPageCount()
+    {
+        if( null === $this->getRequest() ) return null;
+
+        $limit = $this->getPageSize( );
+        $totalResults = $this->getRecordsFound();
+
+        return ceil( $totalResults / $limit );
     }
 
     /**

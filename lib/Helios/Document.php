@@ -32,7 +32,6 @@
 
 namespace Helios;
 
-//require_once dirname( __FILE__ ) . '/vendor/SolrPhpClient/Apache/Solr/Service/Balancer.php';
 class Document extends \Apache_Solr_Document implements \ArrayAccess
 {
     /**

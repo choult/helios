@@ -82,8 +82,8 @@ class HQL
     public function __construct( )
     {
         // set Default offset / limit
-        $this->offset = 0;
-        $this->limit = 10;
+        $this->setFirstResult( 0 );
+        $this->setMaxResults( 10 );
     }
 
 

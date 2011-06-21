@@ -13,7 +13,7 @@ use     Helios\Helios,
 class DocumentTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var Helios_Document
+     * @var Document
      */
     protected $object;
 
@@ -197,6 +197,26 @@ class DocumentTest extends \PHPUnit_Framework_TestCase
         unset( $this->object[ Helios::TYPE_FIELD_NAME ] );
 
         $this->assertTrue( isset( $this->object[ Helios::TYPE_FIELD_NAME ] ) );
+    }
+
+    /**
+     *
+     */
+    public function testToArray( )
+    {
+        $this->assertEquals( 3, count( $this->object->toArray() ) );
+
+        $fields = array( 'type' => $this->docType, 'id' => $this->docId, 'uid' => "{$this->docType}::{$this->docId}" );
+        $this->assertEquals( $fields, $this->object->toArray() );
+
+        // add more fields
+        $this->object->name = 'Test name';
+        $this->object->annotation = 'Annotation';
+        $this->assertEquals( 5, count( $this->object->toArray() ) );
+
+        $fields['name'] = 'Test name';
+        $fields['annotation'] = 'Annotation';
+        $this->assertEquals( $fields, $this->object->toArray() );
     }
 
 }

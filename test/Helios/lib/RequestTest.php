@@ -73,4 +73,38 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException( 'Exception' );
         $this->object->setQuery( $query );
     }
+
+    /**
+     *
+     */
+    public function testPagination()
+    {
+        $this->object->setOffset( 5 );
+        $this->assertEquals( 5, $this->object->getOffset() );
+
+        $this->object->setlimit( 20 );
+        $this->assertEquals( 20, $this->object->getLimit() );
+
+        // Set page
+        $this->object->setCurrentPage( 2 );
+        $this->assertEquals( 2, $this->object->getCurrentPage() );
+    }
+
+    /**
+     *
+     */
+    public function testPaginationSetpage()
+    {
+        // SetCurrentPage only calculate Offset and getCurrentPage calculated from offset/limit
+        $this->object->setlimit( 10 );
+        $this->object->setCurrentPage( 2 );
+
+        $this->assertEquals( 2, $this->object->getCurrentPage() );
+        $this->assertEquals( 10, $this->object->getLimit() );
+        $this->assertEquals( 10, $this->object->getOffset() );
+
+        // change Page by setting offset
+        $this->object->setOffset( 30 ); // == Page 4
+        $this->assertEquals( 4, $this->object->getCurrentPage() );
+    }
 }

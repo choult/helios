@@ -14,7 +14,7 @@ use     Helios\Collection,
 class CollectionTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var Helios_Collection
+     * @var Collection
      */
     protected $object;
 
@@ -186,5 +186,21 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse( isset( $this->object[ 2 ] ) );
     }
 
+    /**
+     * Assert paginator function
+     */
+    public function testPaginatiorFunction()
+    {
+        $request = new Request();
+        $request->setLimit( 10 );
+        $request->setCurrentPage( 2 );
+
+        $this->object->setRequest( $request );
+
+        $this->assertEquals( $this->object->getRequest(), $request );
+        $this->assertEquals( $this->object->getPageSize(), $request->getLimit() );
+        $this->assertEquals( $this->object->getCurrentPage(), $request->getCurrentPage() );
+        $this->assertEquals( $this->object->getRecordsFound(), 0 );
+    }
 
 }

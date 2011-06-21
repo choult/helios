@@ -44,6 +44,8 @@ class Hydrator
     {
         $collection = new Collection( );
 
+        $collection->setResponse( $response );
+        $collection->setRequest( $request );
 
         // hydrate documents
         $payload = $response->response;

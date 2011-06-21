@@ -66,7 +66,25 @@ class HQL
      */
     private $facet;
 
+    /**
+     * @var integer
+     */
+    private $offset;
 
+    /**
+     * @var integer
+     */
+    private $limit;
+
+    /**
+     * Constructor
+     */
+    public function __construct( )
+    {
+        // set Default offset / limit
+        $this->setFirstResult( 0 );
+        $this->setMaxResults( 10 );
+    }
 
 
     /**
@@ -157,16 +175,16 @@ class HQL
         $where = preg_replace( '/([\w\d-_]*)\s?BETWEEN\s?\? AND \?/', '$1:[? TO ?]', $where );
 
         // replace not equal
-        $where = preg_replace( '/([\w\d-_]*)\s?!=\s?\?/', '(*:* -$1:?)', $where );
+        $where = preg_replace( '/([\w\d-_]*)\s?!=\s?\?/', '(*:* -$1:"?")', $where );
 
         // replace equal
-        $where = preg_replace( '/([\w\d-_]*)\s?=\s?\?/', '$1:?', $where );
+        $where = preg_replace( '/([\w\d-_]*)\s?=\s?\?/', '$1:"?"', $where );
 
 
         // relace placeholders
         foreach ( $params as $param )
         {
-            $where = preg_replace( '/\?/', $param, $where, 1 );
+            $where = preg_replace( '/\?/', self::escape( $param ), $where, 1 );
         }
 
 
@@ -243,9 +261,13 @@ class HQL
         // build where conditions
         if ( count( $this->where ) > 0 )
         {
+            if( trim( $query ) != '' )
+            {
+                $query .= ' AND '; // require when merging FROM & WHERE, they are same in SOLR query
+            }
+
             $query .= implode( ' ', $this->where );
         }
-
 
         return $query;
     }
@@ -286,12 +308,10 @@ class HQL
     }
 
     /**
-     *
-     * @param int $offset
-     * @param int $limit
-     * @return Helios_Collection
+     * Execute this HQL query
+     * @return Collection
      */
-    public function execute( $offset = 0, $limit = 10 )
+    public function execute( )
     {
         $req = new Request( );
 
@@ -299,7 +319,11 @@ class HQL
 
         $req->setParams( $this->params( ) );
 
-        return $req->execute( $offset, $limit );
+        $req->setOffset( $this->getFirstResult() );
+
+        $req->setLimit( $this->getMaxresults() );
+
+        return $req->execute( );
     }
 
     /**
@@ -328,8 +352,84 @@ class HQL
         return $bits;
     }
 
+    /**
+     * Set results offset
+     *
+     * @param integer $offset
+     */
+    public function setFirstResult( $offset )
+    {
+        if( !is_numeric( $offset ) )
+        {
+            throw new \Exception( 'setFirstResult expects $offset to be an integer value' );
+        }
 
+        $this->offset = $offset;
+    }
 
+    /**
+     * Retrieve results offset
+     *
+     * @return integer
+     */
+    public function getFirstResult( )
+    {
+        return $this->offset;
+    }
 
+    /**
+     * Set results limit
+     *
+     * @param integer $limit
+     */
+    public function setMaxResults( $limit )
+    {
+        if( !is_numeric( $limit ) )
+        {
+            throw new \Exception( 'setMaxResults expects $limit to be an integer value' );
+        }
+
+        $this->limit = $limit;
+    }
+
+    /**
+     * Retrieve results limit
+     *
+     * @return integer
+     */
+    public function getMaxResults()
+    {
+        return $this->limit;
+    }
+
+    /**
+     * Set result offset based on page number
+     *
+     * @param integer $page
+     */
+    public function setCurrentPage( $page )
+    {
+        if( !is_numeric( $page ) )
+        {
+            throw new \Exception( 'setCurrentPage expects $page argument Type Integer' );
+        }
+
+        $page = ( $page > 1 ) ? $page : 1 ;
+
+        // calculate Offset
+        $this->offset = ( $page * $this->getMaxResults() ) - $this->getMaxResults();
+    }
+
+    /**
+     * Get caculated Current page based on ( offset / Limit )
+     * 
+     * @return integer
+     */
+    public function getCurrentPage( )
+    {
+        $page = ceil( $this->getFirstResult() / $this->getMaxResults() ) + 1;
+
+        return ( $page > 0 ) ? $page : 1 ;
+    }
 
 }

@@ -35,7 +35,7 @@ namespace Helios;
 class Helios
 {
     const UID_FIELD_NAME = 'uid';
-    const TYPE_FIELD_NAME = 'doc_type';
+    const TYPE_FIELD_NAME = 'type';
     const ID_FIELD_NAME = 'id';
     const UID_DELIMITER = '::';
 

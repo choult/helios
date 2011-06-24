@@ -232,7 +232,11 @@ class HQL
     {
         if ( !is_array( $this->facet ) ) $this->facet = array( );
 
-        $this->facet = array_merge( $this->facet, $this->explode( $fields ) );
+        if ( !is_array( $fields ) )
+        {
+            $fields = $this->explode( $fields );
+        }
+        $this->facet = array_merge( $this->facet, $fields );
 
         return $this;
     }
@@ -301,7 +305,7 @@ class HQL
             $params[ 'facet.missing' ]  = 'true';
             $params[ 'facet.prefix' ]   = '';
 
-            $params[ 'facet.field' ][ ] = $this->facet;
+            $params[ 'facet.field' ] = $this->facet;
         }
 
         return $params;
@@ -422,7 +426,7 @@ class HQL
 
     /**
      * Get caculated Current page based on ( offset / Limit )
-     * 
+     *
      * @return integer
      */
     public function getCurrentPage( )

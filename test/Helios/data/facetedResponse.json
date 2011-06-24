@@ -35,6 +35,6 @@
 "facet_counts":{
 "facet_queries":{},
 "facet_fields":{
-"field_one_str":["one",1,"two",2]},
+"field_one_str":{"one":1,"two":2}},
 "facet_dates":{}}
 }

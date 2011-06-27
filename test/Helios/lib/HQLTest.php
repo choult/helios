@@ -117,11 +117,33 @@ class HQLTest extends \PHPUnit_Framework_TestCase
         $this->object->andWhere( 'bar = ?', 'value2' );
         $this->assertEquals( '(foo:"value1") AND (bar:"value2")', $this->object->build( ) );
 
-        $this->object->where( 'foo BETWEEN ? AND ?', array( 10, 20 ) );
-        $this->assertEquals( '(foo:[10 TO 20])', $this->object->build( ) );
+    }
 
-        $this->object->where( 'foo NOT BETWEEN ? AND ?', array( 10, 20 ) );
-        $this->assertEquals( '((*:* -foo:[10 TO 20]))', $this->object->build( ) );
+    /**
+     * Test between Filter query
+     */
+    public function testBetween()
+    {
+
+        $this->object->between( 'foo BETWEEN ? AND ?', array( 10, 20 ) );
+        $param = $this->object->params();
+        $this->assertEquals( '(foo:[10 TO 20])',  $param['fq'] );
+
+        $this->object->between( 'foo NOT BETWEEN ? AND ?', array( 10, 20 ) );
+        $param = $this->object->params();
+        $this->assertEquals( '((*:* -foo:[10 TO 20]))', $param['fq']);
+
+        // and
+        $this->object->between( 'foo BETWEEN ? AND ?', array( 10, 20 ) );
+        $this->object->andBetween( 'boo BETWEEN ? AND ?', array( 30, 40 ) );
+        $param = $this->object->params();
+        $this->assertEquals( '(foo:[10 TO 20]) AND (boo:[30 TO 40])', $param['fq']);
+
+        //or
+        $this->object->between( 'foo BETWEEN ? AND ?', array( 10, 20 ) );
+        $this->object->orBetween( 'boo NOT BETWEEN ? AND ?', array( 30, 40 ) );
+        $param = $this->object->params();
+        $this->assertEquals( '(foo:[10 TO 20]) OR ((*:* -boo:[30 TO 40]))', $param['fq']);
     }
 
     /**
@@ -156,7 +178,7 @@ class HQLTest extends \PHPUnit_Framework_TestCase
         $this->object->addFacetField( 'tags' );
         $params = $this->object->params();
         $this->assertNotEquals( 0, count( $params ) );
-        $this->assertEquals( array( array( 'tags' ) ), $params[ 'facet.field' ] );
+        $this->assertEquals( array( 'tags' ), $params[ 'facet.field' ] );
 
         // validate defaults
         $this->assertEquals( 'true', $params[ 'facet' ] );

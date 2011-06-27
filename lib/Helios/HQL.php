@@ -73,6 +73,12 @@ class HQL
     private $facetFields = array();
 
     /**
+     *
+     * @var array
+     */
+    private $filterQuery = array();
+
+    /**
      * @var integer
      */
     private $offset;
@@ -174,12 +180,6 @@ class HQL
         if ( count( $matches[ 0 ] ) != count( $params ) )
             throw new Exception( 'Too many/few parameters' );
 
-        // replace not between
-        $where = preg_replace( '/([\w\d-_]*)\s?NOT BETWEEN\s?\? AND \?/', '(*:* -$1:[? TO ?])', $where );
-
-        // replace between
-        $where = preg_replace( '/([\w\d-_]*)\s?BETWEEN\s?\? AND \?/', '$1:[? TO ?]', $where );
-
         // replace not equal
         $where = preg_replace( '/([\w\d-_]*)\s?!=\s?\?/', '(*:* -$1:"?")', $where );
 
@@ -195,6 +195,78 @@ class HQL
 
 
         $this->where[ ] = '(' . $where . ')';
+    }
+
+    /**
+     * Filter by between
+     *
+     * @param string $between
+     * @param mixed $params
+     */
+    public function between( $between, $params )
+    {
+        $this->filterQuery = array();
+
+        $this->addBetween( $between, $params );
+    }
+
+    /**
+     * And between
+     *
+     * @param string $between
+     * @param mixed $params
+     */
+    public function andBetween( $between, $params )
+    {
+        $this->filterQuery[ ] = 'AND';
+
+        $this->addBetween( $between, $params );
+    }
+
+    /**
+     * or between
+     *
+     * @param string $between
+     * @param mixed $params
+     */
+    public function orBetween( $between, $params )
+    {
+        $this->filterQuery[ ] = 'OR';
+
+        $this->addBetween( $between, $params );
+    }
+
+    /**
+     * Add Range search
+     *
+     * @param string $between
+     * @param mixed $params
+     */
+    private function addBetween( $between, $params )
+    {
+        // arrayize the params value
+        if ( !is_array( $params ) ) $params = array ( $params );
+
+        // check parameters vs placeholders
+        preg_match_all( '/\?/', $between, $matches );
+
+        if ( count( $matches[ 0 ] ) != count( $params ) )
+            throw new Exception( 'Too many/few parameters' );
+
+        // replace not between
+        $between = preg_replace( '/([\w\d-_]*)\s?NOT BETWEEN\s?\? AND \?/', '(*:* -$1:[? TO ?])', $between );
+
+        // replace between
+        $between = preg_replace( '/([\w\d-_]*)\s?BETWEEN\s?\? AND \?/', '$1:[? TO ?]', $between );
+
+        // relace placeholders
+        foreach ( $params as $param )
+        {
+            $between = preg_replace( '/\?/', self::escape( $param ), $between, 1 );
+        }
+
+
+        $this->filterQuery[ ] =  '(' . $between . ')';
     }
 
     /**
@@ -399,6 +471,12 @@ class HQL
         if( count( $this->getFacets() ) > 0 )
         {
             $params = array_merge( $params, $this->getFacets() );
+        }
+
+        // Apply Filter Query
+        if( count( $this->filterQuery ) > 0 )
+        {
+            $params[ 'fq' ] = implode(' ', $this->filterQuery );
         }
 
         return $params;

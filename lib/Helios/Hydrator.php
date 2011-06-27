@@ -113,18 +113,18 @@ class Hydrator
 
 
 
-    public function hydrateFacet( $name, array $list )
+    public function hydrateFacet( $name, $list )
     {
         $facet = new Facet( );
 
         $facet->setName( $name );
 
-        for ( $i = 0, $j = count( $list ); $i < $j; $i += 2 )
+        foreach ( $list as $name => $count )
         {
             $tag = new Tag( );
 
-            $tag->setName( $list[ $i ] );
-            $tag->setTally( $list[ $i + 1 ] );
+            $tag->setName( $name );
+            $tag->setTally( $count );
 
             $tags[ ] = $tag;
         }

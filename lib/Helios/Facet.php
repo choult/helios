@@ -113,6 +113,19 @@ class Facet implements \IteratorAggregate, \Countable, \ArrayAccess
     }
 
 
+    /**
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        $ret = array();
+        foreach ( $this->tags as $tag )
+        {
+            $ret[ $tag->getName() ] = $tag->getTally();
+        }
+        return $ret;
+    }
 
 
 

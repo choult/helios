@@ -392,7 +392,7 @@ class HQL
         // build facet fields parameters
         if ( count( $this->getFacetFields() ) > 0 )
         {
-            $params[ 'facet.field' ][ ] = $this->getFacetFields();
+            $params[ 'facet.field' ] = $this->getFacetFields();
         }
 
         // apply facet overrides

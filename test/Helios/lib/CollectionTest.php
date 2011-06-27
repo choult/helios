@@ -149,6 +149,15 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals( $facets, $this->object->getFacetDates( ) );
     }
 
+    public function testGetSetFacetRanges()
+    {
+        $facets = array( new Facet( ) );
+
+        $this->object->setFacetRanges( $facets );
+
+        $this->assertEquals( $facets, $this->object->getFacetRanges( ) );
+    }
+
     /**
      *
      */

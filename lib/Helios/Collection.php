@@ -75,8 +75,11 @@ class Collection implements \IteratorAggregate, \Countable, \ArrayAccess
      */
     private $facetDates;
 
-
-
+    /**
+     *
+     * @var type
+     */
+    private $facetRanges;
 
 
     /**
@@ -291,6 +294,25 @@ class Collection implements \IteratorAggregate, \Countable, \ArrayAccess
     public function getRecordsFound( )
     {
         return isset( $this->getResponse()->response->numFound ) ? intval( $this->getResponse()->response->numFound ) : 0;
+    }
+
+    /**
+     * Get Facet ranges
+     * @return array
+     */
+    public function getFacetRanges()
+    {
+        return $this->facetRanges;
+    }
+
+    /**
+     * Set facet ranges
+     *
+     * @param array $facetRanges
+     */
+    public function setFacetRanges( $facetRanges )
+    {
+        $this->facetRanges = $facetRanges;
     }
 
 }

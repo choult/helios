@@ -145,14 +145,117 @@ class HQLTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @todo Implement testParams().
+     * test params
      */
     public function testParams()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
+        $params = $this->object->params();
+        $this->assertEquals( 0, count( $params ), 'No facets added' );
+
+        // add facet Field to check params return
+        $this->object->addFacetField( 'tags' );
+        $params = $this->object->params();
+        $this->assertNotEquals( 0, count( $params ) );
+        $this->assertEquals( array( array( 'tags' ) ), $params[ 'facet.field' ] );
+
+        // validate defaults
+        $this->assertEquals( 'true', $params[ 'facet' ] );
+        $this->assertEquals( '100', $params[ 'facet.limit' ] );
+        $this->assertEquals( '0', $params[ 'facet.offset' ] );
+        $this->assertEquals( '1', $params[ 'facet.mincount' ] );
+        $this->assertEquals( 'true', $params[ 'facet.missing' ] );
+        $this->assertEquals( '', $params[ 'facet.prefix' ] );
+    }
+
+    /**
+     * test adding new facet
+     */
+    public function testAddFacet()
+    {
+        $params = $this->object->params();
+        $this->assertFalse(array_key_exists( 'facet.test', $params  ) );
+
+        $this->object->addFacet( 'facet.test', 'true' );
+        $params = $this->object->params();
+        $this->assertTrue(array_key_exists( 'facet.test', $params  ) );
+        $this->assertEquals( 'true', $params[ 'facet.test' ] );
+
+        // should override existing once
+        $this->object->addFacet( 'facet.test', 'false' );
+        $params = $this->object->params();
+        $this->assertTrue(array_key_exists( 'facet.test', $params  ) );
+        $this->assertEquals( 'false', $params[ 'facet.test' ] );
+    }
+
+    /**
+     * Test get facets
+     */
+    public function testGeFacets()
+    {
+        $this->object->addFacet( 'facet.test', 'get-test' );
+        $facets = $this->object->getFacets();
+        $this->assertEquals( true, is_array( $facets ) );
+        $this->assertEquals( 1, count( $facets ) );
+
+        // tets multiple facets
+        $this->object->addFacet( 'facet.multiple', 'test' );
+        $this->object->addFacet( 'facet.range', 'fieldName' );
+        $facets = $this->object->getFacets();
+        $this->assertEquals( 3, count( $facets ) );
+    }
+
+    /**
+     * Test addng faet Field
+     */
+    public function testAddGetFacetField()
+    {
+        $fields = $this->object->getFacetFields();
+        $this->assertEquals( 0, count( $fields ) );
+
+        $this->object->addFacetField( 'name' );
+        $this->object->addFacetField( 'type' );
+        $this->object->addFacetField( 'tags' );
+
+        $fields = $this->object->getFacetFields();
+        $this->assertEquals( 3, count( $fields ) );
+    }
+
+    /**
+     * test adding a Range facet
+     */
+    public function testAddFacetRange()
+    {
+        $data = array(
+            'field'     => 'occurrence',
+            'start'     => '2011-11-10T15:30:00Z',
+            'end'       => '2011-11-17T15:30:00Z',
+            'gap'       => '+1DAY',
         );
+
+        $this->object->addFacetRange( $data['field'], $data['start'], $data['end'], $data['gap'] );
+
+        $facets = $this->object->getFacets();
+        $this->assertEquals( array( $data['field'] ), $facets[ 'facet.range' ] );
+        $this->assertEquals( $data['start'], $facets[ 'f.'.$data['field'].'.facet.range.start' ] );
+        $this->assertEquals( $data['end'], $facets[ 'f.'.$data['field'].'.facet.range.end' ] );
+        $this->assertEquals( $data['gap'], $facets[ 'f.'.$data['field'].'.facet.range.gap' ] );
+
+        // add Multiple Ranges
+        $range = array(
+            'field'     => 'price',
+            'start'     => '50',
+            'end'       => '500',
+            'gap'       => '+10',
+        );
+
+        $this->object->addFacetRange( $range['field'], $range['start'], $range['end'], $range['gap'] );
+        $facets = $this->object->getFacets();
+        $this->assertEquals( array( $data['field'], $range['field'] ), $facets[ 'facet.range' ] );
+
+        $this->assertEquals( $range['start'], $facets[ 'f.'.$range['field'].'.facet.range.start' ] );
+        $this->assertEquals( $range['end'], $facets[ 'f.'.$range['field'].'.facet.range.end' ] );
+        $this->assertEquals( $range['gap'], $facets[ 'f.'.$range['field'].'.facet.range.gap' ] );
+
     }
 
     /**

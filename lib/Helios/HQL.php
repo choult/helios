@@ -64,7 +64,13 @@ class HQL
     /**
      * @var array
      */
-    private $facet;
+    private $facets = array();
+
+    /**
+     *
+     * @var array
+     */
+    private $facetFields = array();
 
     /**
      * @var integer
@@ -218,21 +224,98 @@ class HQL
     /**
      *
      * @param string $fields
+     * @return HQL
      */
-    public function facetOn( $fields )
+    public function addFacet( $facet, $value )
     {
-        return $this->addFacet( $fields );
+        if( empty( $facet ) )
+        {
+            throw new \InvalidArgumentException( 'addFacet expects first argument to be string value' );
+        }
+
+        $this->facets[ $facet ] = $value;
+
+        return $this;
+    }
+
+    /**
+     * Get facets Key => value pair
+     * @return array
+     */
+    public function getFacets()
+    {
+        return $this->facets;
     }
 
     /**
      *
-     * @param string $fields
+     * @param string $field
+     * @return HQL
      */
-    public function addFacet( $fields )
+    public function addFacetField( $field )
     {
-        if ( !is_array( $this->facet ) ) $this->facet = array( );
+        if( empty( $field ) || !is_string( $field ) )
+        {
+            throw new \InvalidArgumentException( 'Expect first argument to be string' );
+        }
 
-        $this->facet = array_merge( $this->facet, $this->explode( $fields ) );
+        if( !in_array( $field, $this->getFacetFields() ) )
+        {
+            $this->facetFields[] = $field;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get facet Fields
+     *
+     * @return array
+     */
+    public function getFacetFields()
+    {
+        return $this->facetFields;
+    }
+
+    /**
+     * Add Facet range field, Range require Start, End and Gap...
+     * Eg: field: occurrence_dates, rangeStart: 2011-01-01T18:50:00Z, rangeEnd 2011-01-10T10:10:00Z, rangeGap:+1Day
+     * options can be( facet.range.hardend, facet.range.other, facet.range.include )
+     *
+     * @see: http://wiki.apache.org/solr/SimpleFacetParameters
+     *
+     * @param string $field
+     * @param string $rangeStart
+     * @param string $rangeEnd
+     * @param string $rangeGap
+     * @param array $options
+     * @return HQL
+     */
+    public function addFacetRange( $field, $rangeStart, $rangeEnd, $rangeGap, array $options = null )
+    {
+        $facets = $this->getFacets();
+        if( !array_key_exists( 'facet.range' ,$facets ) )
+        {
+            $rangeFields = array();
+        }else{
+            $rangeFields = $facets['facet.range'];
+        }
+
+        $rangeFields[] = $field;
+        $this->addFacet( 'facet.range', $rangeFields );
+
+        $this->addFacet( 'f.' . $field . '.facet.range.start', $rangeStart );
+        $this->addFacet( 'f.' . $field . '.facet.range.end', $rangeEnd );
+        $this->addFacet( 'f.' . $field . '.facet.range.gap', $rangeGap );
+
+        // add additional options
+        if( is_array( $options ) && !empty( $options ) )
+        {
+            foreach( $options as $key => $value )
+            {
+                $this->addFacet( 'f.' . $field . '.' . $key , $value );
+            }
+        }
 
         return $this;
     }
@@ -278,20 +361,18 @@ class HQL
      *  - filter queries
      *  - sorts
      *
-     * @return array
+     * @return array$facets = $this->getFacets();
+
+
      */
     public function params( )
     {
         $params = array( );
 
-        // build sort parameters
-        if ( count( $this->order ) > 0 )
-        {
-            $params[ 'sort' ] = implode( ',', $this->order );
-        }
-
-        // build facet parameters
-        if ( count( $this->facet ) > 0 )
+        /**
+         * Set Defaults
+         */
+        if( count( $this->getFacets() ) > 0 || count( $this->getFacetFields() ) > 0 )
         {
             $params[ 'facet' ]          = 'true';
             $params[ 'facet.sort' ]     = 'count';
@@ -300,8 +381,24 @@ class HQL
             $params[ 'facet.mincount' ] = '1';
             $params[ 'facet.missing' ]  = 'true';
             $params[ 'facet.prefix' ]   = '';
+        }
 
-            $params[ 'facet.field' ][ ] = $this->facet;
+        // build sort parameters
+        if ( count( $this->order ) > 0 )
+        {
+            $params[ 'sort' ] = implode( ',', $this->order );
+        }
+
+        // build facet fields parameters
+        if ( count( $this->getFacetFields() ) > 0 )
+        {
+            $params[ 'facet.field' ][ ] = $this->getFacetFields();
+        }
+
+        // apply facet overrides
+        if( count( $this->getFacets() ) > 0 )
+        {
+            $params = array_merge( $params, $this->getFacets() );
         }
 
         return $params;
@@ -422,7 +519,7 @@ class HQL
 
     /**
      * Get caculated Current page based on ( offset / Limit )
-     * 
+     *
      * @return integer
      */
     public function getCurrentPage( )

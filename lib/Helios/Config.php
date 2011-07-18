@@ -42,7 +42,7 @@ class Config implements \ArrayAccess
     /**
      *
      */
-    public function __construct( $config = null )
+    public function __construct( $config = array() )
     {
         $this->setConfig( $config );
     }

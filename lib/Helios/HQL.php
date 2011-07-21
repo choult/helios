@@ -270,6 +270,81 @@ class HQL
     }
 
     /**
+     * Filter by distance
+     *
+     * @param string $field The field to search on
+     * @param float $latitude The latitude to search around
+     * @param float $longitude The longitude to search around
+     * @param float $distance The radius of the search (in km)
+     */
+    public function within( $field, $latitude, $longitude, $distance )
+    {
+        $this->filterQuery = array();
+        $this->addWithin( $field, $latitude, $longitude, $distance );
+    }
+
+    /**
+     * And within
+     *
+     * @param string $field The field to search on
+     * @param float $latitude The latitude to search around
+     * @param float $longitude The longitude to search around
+     * @param float $distance The radius of the search (in km)
+     */
+    public function andWithin( $field, $latitude, $longitude, $distance )
+    {
+        $this->filterQuery[ ] = 'AND';
+        $this->addWithin( $field, $latitude, $longitude, $distance );
+    }
+
+    /**
+     * Or within
+     *
+     * @param string $field The field to search on
+     * @param float $latitude The latitude to search around
+     * @param float $longitude The longitude to search around
+     * @param float $distance The radius of the search (in km)
+     */
+    public function orWithin( $field, $latitude, $longitude, $distance )
+    {
+        $this->filterQuery[ ] = 'OR';
+        $this->addWithin( $field, $latitude, $longitude, $distance );
+    }
+
+    /**
+     * Add Filter by distance
+     *
+     * @param string $field The field to search on
+     * @param float $latitude The latitude to search around
+     * @param float $longitude The longitude to search around
+     * @param float $distance The radius of the search (in km)
+     */
+    private function addWithin( $field, $latitude, $longitude, $distance )
+    {
+        if ( !$field )
+        {
+            throw new \BadArgumentException( 'No field specified for within search' );
+        }
+
+        if ( !is_numeric( $latitude ) )
+        {
+            throw new \BadArgumentException( 'Latitude must be numeric' );
+        }
+
+        if ( !is_numeric( $longitude ) )
+        {
+            throw new \BadArgumentException( 'Longitude must be numeric' );
+        }
+
+        if ( !is_numeric( $distance ) || $distance <= 0 )
+        {
+            throw new \BadArgumentException( 'Distance must be a number greater than zero' );
+        }
+
+        $this->filterQuery[] = '{!geofilt}&sfield=' . $field . '&pt=' . $latitude . ',' . $longitude . '&d=' . $distance;
+    }
+
+    /**
      *
      * @return Helios_HQL
      */

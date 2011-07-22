@@ -89,6 +89,11 @@ class HQL
     private $limit;
 
     /**
+     * @var type
+     */
+    private $params;
+
+    /**
      * Constructor
      */
     public function __construct( )
@@ -146,8 +151,10 @@ class HQL
      */
     public function andWhere( $where, $params )
     {
-        $this->where[ ] = 'AND';
-
+        if ( is_array( $this->where ) && count( $this->where ) )
+        {
+            $this->where[ ] = 'AND';
+        }
         $this->addWhere( $where, $params );
     }
 
@@ -158,8 +165,10 @@ class HQL
      */
     public function orWhere( $where, $params )
     {
-        $this->where[ ] = 'OR';
-
+        if ( is_array( $this->where ) && count( $this->where ) )
+        {
+            $this->where[ ] = 'OR';
+        }
         $this->addWhere( $where, $params );
     }
 
@@ -218,7 +227,10 @@ class HQL
      */
     public function andBetween( $between, $params )
     {
-        $this->filterQuery[ ] = 'AND';
+        if ( is_array( $this->filterQuery ) && count( $this->filterQuery ) )
+        {
+            $this->filterQuery[ ] = 'AND';
+        }
 
         $this->addBetween( $between, $params );
     }
@@ -231,7 +243,10 @@ class HQL
      */
     public function orBetween( $between, $params )
     {
-        $this->filterQuery[ ] = 'OR';
+        if ( is_array( $this->filterQuery ) && count( $this->filterQuery ) )
+        {
+            $this->filterQuery[ ] = 'OR';
+        }
 
         $this->addBetween( $between, $params );
     }
@@ -293,7 +308,10 @@ class HQL
      */
     public function andWithin( $field, $latitude, $longitude, $distance )
     {
-        $this->filterQuery[ ] = 'AND';
+        if ( is_array( $this->filterQuery ) && count( $this->filterQuery ) )
+        {
+            $this->filterQuery[ ] = 'AND';
+        }
         $this->addWithin( $field, $latitude, $longitude, $distance );
     }
 
@@ -307,7 +325,10 @@ class HQL
      */
     public function orWithin( $field, $latitude, $longitude, $distance )
     {
-        $this->filterQuery[ ] = 'OR';
+        if ( is_array( $this->filterQuery ) && count( $this->filterQuery ) )
+        {
+            $this->filterQuery[ ] = 'OR';
+        }
         $this->addWithin( $field, $latitude, $longitude, $distance );
     }
 
@@ -323,25 +344,30 @@ class HQL
     {
         if ( !$field )
         {
-            throw new \BadArgumentException( 'No field specified for within search' );
+            throw new \InvalidArgumentException( 'No field specified for within search' );
         }
 
         if ( !is_numeric( $latitude ) )
         {
-            throw new \BadArgumentException( 'Latitude must be numeric' );
+            throw new \InvalidArgumentException( 'Latitude must be numeric' );
         }
 
         if ( !is_numeric( $longitude ) )
         {
-            throw new \BadArgumentException( 'Longitude must be numeric' );
+            throw new \InvalidArgumentException( 'Longitude must be numeric' );
         }
 
         if ( !is_numeric( $distance ) || $distance <= 0 )
         {
-            throw new \BadArgumentException( 'Distance must be a number greater than zero' );
+            throw new \InvalidArgumentException( 'Distance must be a number greater than zero' );
         }
 
-        $this->filterQuery[] = '{!geofilt}&sfield=' . $field . '&pt=' . $latitude . ',' . $longitude . '&d=' . $distance;
+
+        $this->params[ 'sfield' ] = $field;
+        $this->params[ 'pt' ] = $latitude . ',' . $longitude;
+        $this->params[ 'd' ] = $distance;
+
+        $this->filterQuery[] = '{!geofilt}';
     }
 
     /**
@@ -514,7 +540,7 @@ class HQL
      */
     public function params( )
     {
-        $params = array( );
+        $params = ( $this->params ) ? $this->params : array();
 
         /**
          * Set Defaults

@@ -229,7 +229,7 @@ class HQL
     {
         if ( is_array( $this->filterQuery ) && count( $this->filterQuery ) )
         {
-            $this->filterQuery[ ] = 'AND';
+            $this->addFilterQuery( 'AND' );
         }
 
         $this->addBetween( $between, $params );
@@ -245,7 +245,7 @@ class HQL
     {
         if ( is_array( $this->filterQuery ) && count( $this->filterQuery ) )
         {
-            $this->filterQuery[ ] = 'OR';
+            $this->addFilterQuery( 'OR' );
         }
 
         $this->addBetween( $between, $params );
@@ -281,7 +281,22 @@ class HQL
         }
 
 
-        $this->filterQuery[ ] =  '(' . $between . ')';
+        $this->addFilterQuery( '(' . $between . ')' );
+    }
+
+    /**
+     * Adds a filter query
+     *
+     * @param string $query
+     */
+    public function addFilterQuery( $query, $params = array() )
+    {
+        // relace placeholders
+        foreach ( $params as $param )
+        {
+            $query = preg_replace( '/\?/', self::escape( $param ), $query, 1 );
+        }
+        $this->filterQuery[] = $query;
     }
 
     /**
@@ -310,7 +325,7 @@ class HQL
     {
         if ( is_array( $this->filterQuery ) && count( $this->filterQuery ) )
         {
-            $this->filterQuery[ ] = 'AND';
+            $this->addFilterQuery( 'AND' );
         }
         $this->addWithin( $field, $latitude, $longitude, $distance );
     }
@@ -327,7 +342,7 @@ class HQL
     {
         if ( is_array( $this->filterQuery ) && count( $this->filterQuery ) )
         {
-            $this->filterQuery[ ] = 'OR';
+            $this->addFilterQuery( 'OR' );
         }
         $this->addWithin( $field, $latitude, $longitude, $distance );
     }
@@ -363,11 +378,11 @@ class HQL
         }
 
 
-        $this->params[ 'sfield' ] = $field;
-        $this->params[ 'pt' ] = $latitude . ',' . $longitude;
-        $this->params[ 'd' ] = $distance;
+        $this->setParam( 'sfield', $field );
+        $this->setParam( 'pt', $latitude . ',' . $longitude );
+        $this->setParam( 'd', $distance );
 
-        $this->filterQuery[] = '{!geofilt}';
+        $this->addFilterQuery( '{!geofilt}' );
     }
 
     /**
@@ -529,16 +544,25 @@ class HQL
     }
 
     /**
+     * Sets a parameter value to be passed to SOLR
+     *
+     * @param mixed $key
+     * @param mixed $value
+     */
+    public function setParam( $key, $value )
+    {
+        $this->params[ $key ] = $value;
+    }
+
+    /**
      * Builds the query parameters
      *  - facets
      *  - filter queries
      *  - sorts
      *
-     * @return array$facets = $this->getFacets();
-
-
+     * @return array
      */
-    public function params( )
+    public function params()
     {
         $params = ( $this->params ) ? $this->params : array();
 

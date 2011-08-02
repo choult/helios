@@ -691,8 +691,8 @@ class HQL
         /* Build Group by */
         if( is_array( $this->groupFields ) && !empty( $this->groupFields ) )
         {
-            $params[ 'group' ] = true;          // Enable Field Collapsing
-            $params[ 'group.ngroups' ] = true;  // Set to return no of matched group sets ( this === numRowsFound )
+            $params[ 'group' ] = "true";          // Enable Field Collapsing
+            $params[ 'group.ngroups' ] = "true";  // Set to return no of matched group sets ( this === numRowsFound )
 
             foreach( $this->groupFields as $key => $value )
             {

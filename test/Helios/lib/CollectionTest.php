@@ -85,7 +85,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
     /**
      *
      */
-    public function testGetSetDocuments()
+    public function testGetSetRecords()
     {
         $documents = array( );
 
@@ -99,18 +99,18 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
 
 
 
-        $this->object->setDocuments( $documents );
+        $this->object->setRecords( $documents );
 
         // test iteration
-        foreach ( $this->object as $document )
+        foreach ( $this->object->getRecords() as $document )
         {
             $this->assertTrue( $document instanceof Document );
         }
 
         // test countable
-        $this->assertEquals( 2, count( $this->object ) );
+        $this->assertEquals( 2, count( $this->object->getRecords() ) );
 
-        $this->assertEquals( $documents, $this->object->getDocuments( ) );
+        $this->assertEquals( $documents, $this->object->getRecords() );
     }
 
     /**
@@ -159,43 +159,6 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     *
-     */
-    public function testArrayAccess()
-    {
-        $document1 = new Document( array( Helios::ID_FIELD_NAME => 1,
-                                                Helios::TYPE_FIELD_NAME => 'some_type') );
-        $document2 = new Document( array( Helios::ID_FIELD_NAME => 2,
-                                                Helios::TYPE_FIELD_NAME => 'some_type') );
-        $document3 = new Document( array( Helios::ID_FIELD_NAME => 3,
-                                                Helios::TYPE_FIELD_NAME => 'some_type') );
-        $documents = array( $document1, $document2 );
-
-        $this->object->setDocuments( $documents );
-
-
-        // test offsetGet
-        $this->assertEquals( 1, $this->object[ 0 ][ 'id' ] );
-        $this->assertEquals( 2, $this->object[ 1 ][ 'id' ] );
-
-
-        // test offsetSet
-        $this->object[ 2 ] = $document3;
-
-        $this->assertEquals( 3, $this->object[ 2 ][ 'id' ] );
-
-
-        // test offsetExists
-        $this->assertTrue( isset( $this->object[ 0 ] ) );
-
-
-        // test offsetUnset
-        unset( $this->object[ 2 ] );
-
-        $this->assertFalse( isset( $this->object[ 2 ] ) );
-    }
-
-    /**
      * Assert paginator function
      */
     public function testPaginatiorFunction()
@@ -209,7 +172,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals( $this->object->getRequest(), $request );
         $this->assertEquals( $this->object->getPageSize(), $request->getLimit() );
         $this->assertEquals( $this->object->getCurrentPage(), $request->getCurrentPage() );
-        $this->assertEquals( $this->object->getRecordsFound(), 0 );
+        $this->assertEquals( $this->object->getNumRecords(), 0 );
     }
 
 }

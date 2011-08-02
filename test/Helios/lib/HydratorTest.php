@@ -59,16 +59,17 @@ class HydratorTest extends \PHPUnit_Framework_TestCase
     {
         $collection = $this->object->hydrate( $this->request, $this->response );
 
-        $this->assertEquals( 2, count( $collection ) );
+        $documents = $collection->getRecords();
+        $this->assertEquals( 2, count( $collection->getRecords() ) );
 
-        $this->assertEquals( 'foo-1', $collection[ 0 ][ 'uid' ] );
-        $this->assertEquals( 'foo-2', $collection[ 1 ][ 'uid' ] );
+        $this->assertEquals( 'foo-1', $documents[ 0 ][ 'uid' ] );
+        $this->assertEquals( 'foo-2', $documents[ 1 ][ 'uid' ] );
 
-        $this->assertEquals( 'one', $collection[ 0 ][ 'field_one_str' ] );
-        $this->assertEquals( 2, $collection[ 0 ][ 'field_two_int' ] );
+        $this->assertEquals( 'one', $documents[ 0 ][ 'field_one_str' ] );
+        $this->assertEquals( 2, $documents[ 0 ][ 'field_two_int' ] );
 
-        $this->assertEquals( 'two', $collection[ 1 ][ 'field_one_str' ] );
-        $this->assertEquals( 3, $collection[ 1 ][ 'field_two_int' ] );
+        $this->assertEquals( 'two', $documents[ 1 ][ 'field_one_str' ] );
+        $this->assertEquals( 3, $documents[ 1 ][ 'field_two_int' ] );
     }
 
     /**

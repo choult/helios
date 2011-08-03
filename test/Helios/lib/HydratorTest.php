@@ -100,4 +100,36 @@ class HydratorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals( 2, $tag->getTally( ) );
     }
 
+    /**
+     * Group hydrated
+     */
+    public function testhydrateGroups()
+    {
+        $this->loadGroupedResponse();
+
+        $collection = $this->object->hydrate( $this->request, $this->response );
+        $this->assertEquals( true, $collection->isRecordsGrouped() );
+        $this->assertEquals( true, is_array( $collection->getRecords() ) );
+        $this->assertEquals( 5, count( $collection->getRecords() ) );
+        $this->assertEquals( 5, $collection->getNumRecords() );
+
+        $groupedRecords = $collection->getRecords();
+        $group1 = $groupedRecords[ 0 ];
+
+        $this->assertEquals( true, is_array( $group1 ) );
+        $this->assertEquals( 1, count( $group1 ) );
+        $this->assertEquals( "Helios\\Document", get_class( $group1[0] ) );
+    }
+
+    /**
+     * Load grouped response MOCK JSON
+     */
+    private function loadGroupedResponse()
+    {
+        $rawResponse = file_get_contents( dirname(__FILE__) . '/../data/groupedResponse.json' );
+
+        $this->response = new \Apache_Solr_Response( new \Apache_Solr_HttpTransport_Response( 200, 'Content-Type: text/plain; charset=UTF-8', $rawResponse ), false  );
+        $this->request->setParams( array( 'group' => "true" ) );
+    }
+
 }

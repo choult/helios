@@ -32,7 +32,7 @@
 
 
 /**
- * Helios_Collection
+ * Collection
  *
  * Is a collection of
  *  -
@@ -89,7 +89,7 @@ class Collection
 
     /**
      *
-     * @return Helios_Request
+     * @return Request
      */
     public function getRequest( )
     {
@@ -98,7 +98,7 @@ class Collection
 
     /**
      *
-     * @param Helios_Request $query
+     * @param Request $query
      */
     public function setRequest( Request $request )
     {
@@ -272,6 +272,18 @@ class Collection
     public function setFacetRanges( $facetRanges )
     {
         $this->facetRanges = $facetRanges;
+    }
+
+
+    /**
+     * Get is records are groupped
+     *
+     * @return boolean It will be true for "Group By" query
+     */
+    public function isRecordsGrouped()
+    {
+        $params = $this->getRequest()->getParams();
+        return ( isset( $params[ 'group' ] ) && $params[ 'group' ] == true );
     }
 
 }

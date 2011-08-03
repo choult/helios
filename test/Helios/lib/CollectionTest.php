@@ -175,4 +175,18 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals( $this->object->getNumRecords(), 0 );
     }
 
+    public function testIsRecordsGrouped()
+    {
+        $request = new \Helios\Request();
+        $request->setParams( array( 'group' => "true" ) );
+
+        $this->object->setRequest( $request );
+
+        $this->assertEquals( true, $this->object->isRecordsGrouped() );
+
+        $request = new \Helios\Request();
+        $this->object->setRequest( $request );
+        $this->assertEquals( false, $this->object->isRecordsGrouped() );
+    }
+
 }

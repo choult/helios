@@ -82,9 +82,9 @@ class Hydrator
 
     /**
      *
-     * @param Helios_Request $request
+     * @param Request $request
      * @param Apache_Solr_Response $response
-     * @return Helios_Collection
+     * @return Collection
      */
     public function hydrate( Request $request, \Apache_Solr_Response $response )
     {
@@ -100,7 +100,8 @@ class Hydrator
         {
             if( !empty( $response->grouped ) )
             {
-                $groupField = array_shift( $response->grouped );
+                $groupedResults = (array)$response->grouped;
+                $groupField = array_shift( $groupedResults );
                 $documents = $this->hydrateGroups( $groupField->groups );
                 $collection->setNumRecords( $groupField->ngroups );
             }

@@ -103,13 +103,13 @@ class Hydrator
                 $groupedResults = (array)$response->grouped;
                 $groupField = array_shift( $groupedResults );
                 $documents = $this->hydrateGroups( $groupField->groups );
-                $collection->setNumRecords( $groupField->ngroups );
+                $collection->setNumRecords( intval( $groupField->ngroups ) );
             }
         }
         else
         {
             $documents = $this->hydrateDocuments( $response->response );
-            $collection->setNumRecords( $response->numFound );
+            $collection->setNumRecords( intval( $response->response->numFound ) );
         }
 
         // Save the result

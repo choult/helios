@@ -240,11 +240,6 @@ class HQL
      */
     public function andBetween( $between, $params )
     {
-        if ( is_array( $this->filterQuery ) && count( $this->filterQuery ) )
-        {
-            $this->addFilterQuery( 'AND' );
-        }
-
         $this->addBetween( $between, $params );
     }
 
@@ -256,6 +251,13 @@ class HQL
      */
     public function orBetween( $between, $params )
     {
+        /**
+         * Current implementation of Filter Query does not support OR query
+         * All quries are passed SOLR as and separated query.
+         * @see $this->params() for implementation
+         */
+        throw new \BadMethodCallException( "This function is deprecated" );
+
         if ( is_array( $this->filterQuery ) && count( $this->filterQuery ) )
         {
             $this->addFilterQuery( 'OR' );
@@ -336,10 +338,6 @@ class HQL
      */
     public function andWithin( $field, $latitude, $longitude, $distance )
     {
-        if ( is_array( $this->filterQuery ) && count( $this->filterQuery ) )
-        {
-            $this->addFilterQuery( 'AND' );
-        }
         $this->addWithin( $field, $latitude, $longitude, $distance );
     }
 
@@ -353,6 +351,13 @@ class HQL
      */
     public function orWithin( $field, $latitude, $longitude, $distance )
     {
+        /**
+         * Current implementation of Filter Query does not support OR query
+         * All quries are passed SOLR as and separated query.
+         * @see $this->params() for implementation
+         */
+        throw new \BadMethodCallException( "This function is deprecated" );
+
         if ( is_array( $this->filterQuery ) && count( $this->filterQuery ) )
         {
             $this->addFilterQuery( 'OR' );
@@ -685,7 +690,11 @@ class HQL
         // Apply Filter Query
         if( count( $this->filterQuery ) > 0 )
         {
-            $params[ 'fq' ] = implode(' ', $this->filterQuery );
+            /**
+             * Pass the Filter Query as Array, this will be parsed as AND filter queries..
+             * it seems that OR applied to any rules within 1 FQ. When we should be using AND, it should be a separate FQ
+             */
+            $params[ 'fq' ] = $this->filterQuery;
         }
 
         /* Build Group by */

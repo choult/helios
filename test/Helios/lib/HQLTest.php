@@ -127,18 +127,19 @@ class HQLTest extends \PHPUnit_Framework_TestCase
 
         $this->object->between( 'foo BETWEEN ? AND ?', array( 10, 20 ) );
         $param = $this->object->params();
-        $this->assertEquals( '(foo:[10 TO 20])',  $param['fq'] );
+        $this->assertEquals( array( '(foo:[10 TO 20])' ),  $param['fq'] );
 
         $this->object->between( 'foo NOT BETWEEN ? AND ?', array( 10, 20 ) );
         $param = $this->object->params();
-        $this->assertEquals( '((*:* -foo:[10 TO 20]))', $param['fq']);
+        $this->assertEquals( array( '((*:* -foo:[10 TO 20]))' ), $param['fq']);
 
         // and
         $this->object->between( 'foo BETWEEN ? AND ?', array( 10, 20 ) );
         $this->object->andBetween( 'boo BETWEEN ? AND ?', array( 30, 40 ) );
         $param = $this->object->params();
-        $this->assertEquals( '(foo:[10 TO 20]) AND (boo:[30 TO 40])', $param['fq']);
+        $this->assertEquals( array( '(foo:[10 TO 20])', '(boo:[30 TO 40])' ), $param['fq']);
 
+        $this->markTestIncomplete( 'OR function has been deprecated' );
         //or
         $this->object->between( 'foo BETWEEN ? AND ?', array( 10, 20 ) );
         $this->object->orBetween( 'boo NOT BETWEEN ? AND ?', array( 30, 40 ) );

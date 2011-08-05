@@ -38,7 +38,16 @@ use Helios\Collection;
 
 class Hydrator
 {
+    /**
+     *
+     * @var \Helios\Document
+     */
     private $documentClass;
+
+    /**
+     *
+     * @var \Helios\Collection
+     */
     private $collectionClass;
 
     /**
@@ -50,7 +59,7 @@ class Hydrator
     {
         if( !class_exists( $document ) )
         {
-            throw new \InvalidArgumentException( "class '{$document}' could not be loaded" );
+            throw new \InvalidArgumentException( "Class '{$document}' could not be loaded" );
         }
 
         $this->documentClass = $document;
@@ -65,7 +74,7 @@ class Hydrator
     {
         if( !class_exists( $collection ) )
         {
-            throw new \InvalidArgumentException( "class '{$collection}' could not be loaded" );
+            throw new \InvalidArgumentException( "Class '{$collection}' could not be loaded" );
         }
 
         $this->collectionClass = $collection;
@@ -81,7 +90,7 @@ class Hydrator
     }
 
     /**
-     *
+     * Parse solr response into "Document"
      * @param Request $request
      * @param Apache_Solr_Response $response
      * @return Collection
@@ -96,7 +105,7 @@ class Hydrator
         $requestParams = $request->getParams();
 
         $documents = array();
-        if( isset( $requestParams['group'] ) && $requestParams['group'] == true)
+        if( isset( $requestParams['group'] ) && $requestParams['group'] == "true" )
         {
             if( !empty( $response->grouped ) )
             {

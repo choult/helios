@@ -103,12 +103,12 @@ class HydratorTest extends \PHPUnit_Framework_TestCase
     /**
      * Group hydrated
      */
-    public function testhydrateGroups()
+    public function testHydrateGroups()
     {
         $this->loadGroupedResponse();
 
         $collection = $this->object->hydrate( $this->request, $this->response );
-        $this->assertEquals( true, $collection->isRecordsGrouped() );
+        $this->assertEquals( true, $collection->areRecordsGrouped() );
         $this->assertEquals( true, is_array( $collection->getRecords() ) );
         $this->assertEquals( 5, count( $collection->getRecords() ) );
         $this->assertEquals( 5, $collection->getNumRecords() );

@@ -276,11 +276,11 @@ class Collection
 
 
     /**
-     * Get is records are groupped
+     * Get are records groupped
      *
      * @return boolean It will be true for "Group By" query
      */
-    public function isRecordsGrouped()
+    public function areRecordsGrouped()
     {
         $params = $this->getRequest()->getParams();
         return ( isset( $params[ 'group' ] ) && $params[ 'group' ] == true );

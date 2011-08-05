@@ -528,7 +528,7 @@ class HQL
 
     /**
      * Group search resuts by a "STRING" solr field
-     * *Currently Solr 3.3 only group single fields, hence everytime user call this function old group fields will be replaced with new.*
+     * *Currently Solr 3.4 only group single fields, hence everytime user call this function old group fields will be replaced with new.*
      *
      * @param string $fieldName     field name to group records, This should be a STRING field
      * @param integer $groupLimit   No of documents limit per group, each group can have "n" number of documents in them

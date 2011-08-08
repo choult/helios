@@ -127,18 +127,19 @@ class HQLTest extends \PHPUnit_Framework_TestCase
 
         $this->object->between( 'foo BETWEEN ? AND ?', array( 10, 20 ) );
         $param = $this->object->params();
-        $this->assertEquals( '(foo:[10 TO 20])',  $param['fq'] );
+        $this->assertEquals( array( '(foo:[10 TO 20])' ),  $param['fq'] );
 
         $this->object->between( 'foo NOT BETWEEN ? AND ?', array( 10, 20 ) );
         $param = $this->object->params();
-        $this->assertEquals( '((*:* -foo:[10 TO 20]))', $param['fq']);
+        $this->assertEquals( array( '((*:* -foo:[10 TO 20]))' ), $param['fq']);
 
         // and
         $this->object->between( 'foo BETWEEN ? AND ?', array( 10, 20 ) );
         $this->object->andBetween( 'boo BETWEEN ? AND ?', array( 30, 40 ) );
         $param = $this->object->params();
-        $this->assertEquals( '(foo:[10 TO 20]) AND (boo:[30 TO 40])', $param['fq']);
+        $this->assertEquals( array( '(foo:[10 TO 20])', '(boo:[30 TO 40])' ), $param['fq']);
 
+        $this->markTestIncomplete( 'OR function has been deprecated' );
         //or
         $this->object->between( 'foo BETWEEN ? AND ?', array( 10, 20 ) );
         $this->object->orBetween( 'boo NOT BETWEEN ? AND ?', array( 30, 40 ) );
@@ -323,5 +324,89 @@ class HQLTest extends \PHPUnit_Framework_TestCase
         // change Page by setting offset
         $this->object->setFirstResult( 30 ); // == Page 4
         $this->assertEquals( 4, $this->object->getCurrentPage() );
+    }
+
+    /**
+     *
+     */
+    public function testGroupBy()
+    {
+        $this->object->groupBy( 'testFieldName' );
+        $params = $this->object->params();
+        $this->assertEquals( true, \array_key_exists( 'group', $params ) );
+        $this->assertEquals( true, \array_key_exists( 'group.field', $params ) );
+        $this->assertEquals( true, \array_key_exists( 'group.ngroups', $params ) );
+        $this->assertEquals( true, \array_key_exists( 'group.limit', $params ) );
+        $this->assertEquals( true, \array_key_exists( 'group.offset', $params ) );
+        $this->assertEquals( false, \array_key_exists( 'group.sort', $params ) );
+        $this->assertEquals( true, $params['group'] );
+        $this->assertEquals( true, $params['group.ngroups'] );
+        $this->assertEquals( 'testFieldName', $params['group.field'] );
+
+        $this->object->groupBy( 'newField', 10, 0, 'name' );
+        $params = $this->object->params();
+        $this->assertEquals( true, \array_key_exists( 'group', $params ) );
+        $this->assertEquals( true, \array_key_exists( 'group.sort', $params ) );
+        $this->assertEquals( true, $params['group'] );
+        $this->assertEquals( 'newField', $params['group.field'] );
+        $this->assertEquals( 'name', $params['group.sort'] );
+        $this->assertEquals( 10, $params['group.limit'] );
+        $this->assertEquals( 0, $params['group.offset'] );
+
+    }
+
+    /**
+     *
+     */
+    public function testGroupQuery()
+    {
+        $this->object->groupWhere( 'name = ?', "solr" );
+        $params = $this->object->params();
+        $this->assertEquals( false, \array_key_exists( 'group', $params ) );
+        $this->assertEquals( false, \array_key_exists( 'group.query', $params ), 'Unless group by specified, group should not be implemented' );
+
+        $this->object->groupBy( 'postcode' );
+        $params = $this->object->params();
+        $this->assertEquals( true, \array_key_exists( 'group', $params ) );
+        $this->assertEquals( true, \array_key_exists( 'group.query', $params ) );
+        $this->assertEquals( '(name:"solr")', $params['group.query'] );
+
+        $this->object->andGroupWhere( 'version = ?', "3.3" );
+        $params = $this->object->params();
+        $this->assertEquals( '(name:"solr") AND (version:"3.3")', $params['group.query'] );
+
+        $this->object->orGroupWhere( 'version = ?', "4.0" );
+        $params = $this->object->params();
+        $this->assertEquals( '(name:"solr") AND (version:"3.3") OR (version:"4.0")', $params['group.query'] );
+    }
+
+    /**
+     *
+     */
+    public function testAndGroupWhere()
+    {
+        $this->object->groupBy( 'postcode' );
+        $this->object->andGroupWhere( 'name = ? AND version = ?', array( "solr", '3.3' ) );
+        $params = $this->object->params();
+        $this->assertEquals( '(name:"solr" AND version:"3.3")', $params['group.query'] );
+
+        $this->object->andGroupWhere( 'release = ?','687' );
+        $params = $this->object->params();
+        $this->assertEquals( '(name:"solr" AND version:"3.3") AND (release:"687")', $params['group.query'] );
+    }
+
+    /**
+     *
+     */
+    public function testOrGroupWhere()
+    {
+        $this->object->groupBy( 'postcode' );
+        $this->object->orGroupWhere( 'name = ? AND version = ?', array( "solr", '3.3' ) );
+        $params = $this->object->params();
+        $this->assertEquals( '(name:"solr" AND version:"3.3")', $params['group.query'] );
+
+        $this->object->orGroupWhere( 'version = ?','4.0' );
+        $params = $this->object->params();
+        $this->assertEquals( '(name:"solr" AND version:"3.3") OR (version:"4.0")', $params['group.query'] );
     }
 }

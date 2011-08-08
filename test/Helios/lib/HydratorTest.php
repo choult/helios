@@ -59,16 +59,17 @@ class HydratorTest extends \PHPUnit_Framework_TestCase
     {
         $collection = $this->object->hydrate( $this->request, $this->response );
 
-        $this->assertEquals( 2, count( $collection ) );
+        $documents = $collection->getRecords();
+        $this->assertEquals( 2, count( $collection->getRecords() ) );
 
-        $this->assertEquals( 'foo-1', $collection[ 0 ][ 'uid' ] );
-        $this->assertEquals( 'foo-2', $collection[ 1 ][ 'uid' ] );
+        $this->assertEquals( 'foo-1', $documents[ 0 ][ 'uid' ] );
+        $this->assertEquals( 'foo-2', $documents[ 1 ][ 'uid' ] );
 
-        $this->assertEquals( 'one', $collection[ 0 ][ 'field_one_str' ] );
-        $this->assertEquals( 2, $collection[ 0 ][ 'field_two_int' ] );
+        $this->assertEquals( 'one', $documents[ 0 ][ 'field_one_str' ] );
+        $this->assertEquals( 2, $documents[ 0 ][ 'field_two_int' ] );
 
-        $this->assertEquals( 'two', $collection[ 1 ][ 'field_one_str' ] );
-        $this->assertEquals( 3, $collection[ 1 ][ 'field_two_int' ] );
+        $this->assertEquals( 'two', $documents[ 1 ][ 'field_one_str' ] );
+        $this->assertEquals( 3, $documents[ 1 ][ 'field_two_int' ] );
     }
 
     /**
@@ -97,6 +98,38 @@ class HydratorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals( 'two', $tag->getName( ) );
         $this->assertEquals( 2, $tag->getTally( ) );
+    }
+
+    /**
+     * Group hydrated
+     */
+    public function testHydrateGroups()
+    {
+        $this->loadGroupedResponse();
+
+        $collection = $this->object->hydrate( $this->request, $this->response );
+        $this->assertEquals( true, $collection->areRecordsGrouped() );
+        $this->assertEquals( true, is_array( $collection->getRecords() ) );
+        $this->assertEquals( 5, count( $collection->getRecords() ) );
+        $this->assertEquals( 5, $collection->getNumRecords() );
+
+        $groupedRecords = $collection->getRecords();
+        $group1 = $groupedRecords[ 0 ];
+
+        $this->assertEquals( true, is_array( $group1 ) );
+        $this->assertEquals( 1, count( $group1 ) );
+        $this->assertEquals( "Helios\\Document", get_class( $group1[0] ) );
+    }
+
+    /**
+     * Load grouped response MOCK JSON
+     */
+    private function loadGroupedResponse()
+    {
+        $rawResponse = file_get_contents( dirname(__FILE__) . '/../data/groupedResponse.json' );
+
+        $this->response = new \Apache_Solr_Response( new \Apache_Solr_HttpTransport_Response( 200, 'Content-Type: text/plain; charset=UTF-8', $rawResponse ), false  );
+        $this->request->setParams( array( 'group' => "true" ) );
     }
 
 }

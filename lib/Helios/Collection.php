@@ -32,7 +32,7 @@
 
 
 /**
- * Helios_Collection
+ * Collection
  *
  * Is a collection of
  *  -
@@ -41,7 +41,7 @@
 
 namespace Helios;
 
-class Collection implements \IteratorAggregate, \Countable, \ArrayAccess
+class Collection
 {
 
     /**
@@ -58,7 +58,7 @@ class Collection implements \IteratorAggregate, \Countable, \ArrayAccess
     /**
      * @var array
      */
-    private $documents;
+    private $records;
 
     /**
      * @var array
@@ -81,10 +81,15 @@ class Collection implements \IteratorAggregate, \Countable, \ArrayAccess
      */
     private $facetRanges;
 
+    /**
+     *
+     * @var integer
+     */
+    private $numRecords = 0;
 
     /**
      *
-     * @return Helios_Request
+     * @return Request
      */
     public function getRequest( )
     {
@@ -93,7 +98,7 @@ class Collection implements \IteratorAggregate, \Countable, \ArrayAccess
 
     /**
      *
-     * @param Helios_Request $query
+     * @param Request $query
      */
     public function setRequest( Request $request )
     {
@@ -119,21 +124,22 @@ class Collection implements \IteratorAggregate, \Countable, \ArrayAccess
     }
 
     /**
+     * Get array of records
      *
-     * @return array
+     * @return array When group query hydrated, it would be array( n => array( docs, .. ) ). Otherwise it would be array( docs, ...)
      */
-    public function getDocuments( )
+    public function getRecords( )
     {
-        return $this->documents;
+        return $this->records;
     }
 
     /**
      *
-     * @param array $documents
+     * @param array $records
      */
-    public function setDocuments( $documents )
+    public function setRecords( array $records )
     {
-        $this->documents = $documents;
+        $this->records = $records;
     }
 
     /**
@@ -191,64 +197,6 @@ class Collection implements \IteratorAggregate, \Countable, \ArrayAccess
     }
 
     /**
-     *
-     * @return ArrayIterator
-     */
-    public function getIterator( )
-    {
-        return new \ArrayIterator( (array) $this->documents );
-    }
-
-    /**
-     *
-     * @return int
-     */
-    public function count( )
-    {
-        if ( !is_array( $this->documents ) ) return 0;
-
-        return count( $this->documents );
-    }
-
-    /**
-     *
-     * @param string $key
-     */
-    public function offsetGet( $key )
-    {
-        return $this->documents[ $key ];
-    }
-
-    /**
-     *
-     * @param string $key
-     * @param mixed $value
-     */
-    public function offsetSet( $key, $value )
-    {
-        $this->documents[ $key ] = $value;
-    }
-
-    /**
-     *
-     * @param string $key
-     * @return bool
-     */
-    public function offsetExists( $key )
-    {
-        return isset( $this->documents[ $key ] );
-    }
-
-    /**
-     *
-     * @param string $key
-     */
-    public function offsetUnset( $key )
-    {
-        unset( $this->documents[ $key ] );
-    }
-
-    /**
      * Pagination: Get result limit
      * @return integer
      */
@@ -282,7 +230,7 @@ class Collection implements \IteratorAggregate, \Countable, \ArrayAccess
         if( null === $this->getRequest() ) return null;
 
         $limit = $this->getPageSize( );
-        $totalResults = $this->getRecordsFound();
+        $totalResults = $this->getNumRecords();
 
         return ceil( $totalResults / $limit );
     }
@@ -291,10 +239,21 @@ class Collection implements \IteratorAggregate, \Countable, \ArrayAccess
      * Pagibnation: Get Total results count
      * @return integer
      */
-    public function getRecordsFound( )
+    public function getNumRecords( )
     {
-        return isset( $this->getResponse()->response->numFound ) ? intval( $this->getResponse()->response->numFound ) : 0;
+        return $this->numRecords;
     }
+
+    /**
+     * Set number of records/documents Found
+     *
+     * @param integer $records
+     */
+    public function setNumRecords( $recordsCount )
+    {
+        $this->numRecords = $recordsCount;
+    }
+
 
     /**
      * Get Facet ranges
@@ -313,6 +272,18 @@ class Collection implements \IteratorAggregate, \Countable, \ArrayAccess
     public function setFacetRanges( $facetRanges )
     {
         $this->facetRanges = $facetRanges;
+    }
+
+
+    /**
+     * Get are records groupped
+     *
+     * @return boolean It will be true for "Group By" query
+     */
+    public function areRecordsGrouped()
+    {
+        $params = $this->getRequest()->getParams();
+        return ( isset( $params[ 'group' ] ) && $params[ 'group' ] == true );
     }
 
 }

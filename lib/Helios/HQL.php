@@ -43,7 +43,7 @@ class HQL
      * $q->where( 'occurrence_date NOT BETWEEN ? AND ?', array() );
      *
      *
-     * $q->addWhere( 'section_htag' );
+     * $q->andWhere( 'section_htag' );
      */
 
     /**
@@ -77,6 +77,18 @@ class HQL
      * @var array
      */
     private $filterQuery = array();
+
+    /**
+     *
+     * @var array
+     */
+    private $groupFields = array();
+
+    /**
+     *
+     * @var array
+     */
+    private $groupQuery = array();
 
     /**
      * @var integer
@@ -141,7 +153,7 @@ class HQL
     {
         $this->where = array( );
 
-        $this->addWhere( $where, $params );
+        $this->where[ ] = $this->getWhereQuery( $where, $params );
     }
 
     /**
@@ -155,7 +167,7 @@ class HQL
         {
             $this->where[ ] = 'AND';
         }
-        $this->addWhere( $where, $params );
+        $this->where[ ] = $this->getWhereQuery( $where, $params );
     }
 
     /**
@@ -169,16 +181,17 @@ class HQL
         {
             $this->where[ ] = 'OR';
         }
-        $this->addWhere( $where, $params );
+        $this->where[ ] = $this->getWhereQuery( $where, $params );
     }
 
     /**
      *
      * @param string $where
      * @param mixed $params
+     * @return string Formatted solr where query
      * @todo parse localsolr params (e.g. lat, lng, radius) out of query into params[]
      */
-    private function addWhere( $where, $params )
+    private function getWhereQuery( $where, $params )
     {
         // arrayize the params value
         if ( !is_array( $params ) ) $params = array ( $params );
@@ -203,7 +216,7 @@ class HQL
         }
 
 
-        $this->where[ ] = '(' . $where . ')';
+        return '(' . $where . ')';
     }
 
     /**
@@ -227,11 +240,6 @@ class HQL
      */
     public function andBetween( $between, $params )
     {
-        if ( is_array( $this->filterQuery ) && count( $this->filterQuery ) )
-        {
-            $this->addFilterQuery( 'AND' );
-        }
-
         $this->addBetween( $between, $params );
     }
 
@@ -243,6 +251,13 @@ class HQL
      */
     public function orBetween( $between, $params )
     {
+        /**
+         * Current implementation of Filter Query does not support OR query
+         * All quries are passed SOLR as and separated query.
+         * @see $this->params() for implementation
+         */
+        throw new \BadMethodCallException( "This function is deprecated" );
+
         if ( is_array( $this->filterQuery ) && count( $this->filterQuery ) )
         {
             $this->addFilterQuery( 'OR' );
@@ -323,10 +338,6 @@ class HQL
      */
     public function andWithin( $field, $latitude, $longitude, $distance )
     {
-        if ( is_array( $this->filterQuery ) && count( $this->filterQuery ) )
-        {
-            $this->addFilterQuery( 'AND' );
-        }
         $this->addWithin( $field, $latitude, $longitude, $distance );
     }
 
@@ -340,6 +351,13 @@ class HQL
      */
     public function orWithin( $field, $latitude, $longitude, $distance )
     {
+        /**
+         * Current implementation of Filter Query does not support OR query
+         * All quries are passed SOLR as and separated query.
+         * @see $this->params() for implementation
+         */
+        throw new \BadMethodCallException( "This function is deprecated" );
+
         if ( is_array( $this->filterQuery ) && count( $this->filterQuery ) )
         {
             $this->addFilterQuery( 'OR' );
@@ -509,6 +527,77 @@ class HQL
     }
 
     /**
+     * Group search resuts by a "STRING" solr field
+     * *Currently Solr 3.4 only group single fields, hence everytime user call this function old group fields will be replaced with new.*
+     *
+     * @param string $fieldName     field name to group records, This should be a STRING field
+     * @param integer $groupLimit   No of documents limit per group, each group can have "n" number of documents in them
+     * @param integer $groupOffset  Offset of group documents. This only apply to individual groups, not global results set
+     * @param string $groupSort  Order group by
+     *
+     * @see http://wiki.apache.org/solr/FieldCollapsing for more information
+     */
+    public function groupBy( $fieldName, $groupLimit = 1, $groupOffset = 0, $groupSort = false )
+    {
+        $this->groupFields = array(
+            'field'     => $fieldName,
+            'limit'     => $groupLimit,
+            'offset'    => $groupOffset,
+        );
+
+        if( false !== $groupSort )
+        {
+            $this->groupFields[ 'sort' ] = $groupSort;
+        }
+
+    }
+
+    /**
+     * Query group documents with where query
+     *
+     * @param string $where
+     * @param mixed $params
+     */
+    public function groupWhere( $where, $params )
+    {
+        $this->groupQuery = array();
+
+        $this->groupQuery[ ] = $this->getWhereQuery( $where, $params );
+    }
+
+    /**
+     * Add another where query to group results
+     *
+     * @param string $where
+     * @param mixed $params
+     */
+    public function andGroupWhere( $where, $params )
+    {
+        if( !empty( $this->groupQuery ) )
+        {
+            $this->groupQuery[ ] = 'AND';
+        }
+
+        $this->groupQuery[ ] = $this->getWhereQuery( $where, $params );
+    }
+
+    /**
+     * Add an OR where query to group results
+     *
+     * @param string $where
+     * @param mixed $params
+     */
+    public function orGroupWhere( $where, $params )
+    {
+        if( !empty( $this->groupQuery ) )
+        {
+            $this->groupQuery[ ] = 'OR';
+        }
+
+        $this->groupQuery[ ] = $this->getWhereQuery( $where, $params );
+    }
+
+    /**
      * Builds the query string
      *
      * @return string
@@ -601,7 +690,29 @@ class HQL
         // Apply Filter Query
         if( count( $this->filterQuery ) > 0 )
         {
-            $params[ 'fq' ] = implode(' ', $this->filterQuery );
+            /**
+             * Pass the Filter Query as Array, this will be parsed as AND filter queries..
+             * it seems that OR applied to any rules within 1 FQ. When we should be using AND, it should be a separate FQ
+             */
+            $params[ 'fq' ] = $this->filterQuery;
+        }
+
+        /* Build Group by */
+        if( is_array( $this->groupFields ) && !empty( $this->groupFields ) )
+        {
+            $params[ 'group' ] = "true";          // Enable Field Collapsing
+            $params[ 'group.ngroups' ] = "true";  // Set to return no of matched group sets ( this === numRowsFound )
+
+            foreach( $this->groupFields as $key => $value )
+            {
+                $params[ "group.{$key}" ] = $value;
+            }
+
+            // Apply any Group query
+            if( is_array( $this->groupQuery ) && !empty( $this->groupQuery ) )
+            {
+                $params[ 'group.query' ] = \implode(' ', $this->groupQuery );
+            }
         }
 
         return $params;

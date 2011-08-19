@@ -53,7 +53,7 @@ class Facet implements \IteratorAggregate, \Countable, \ArrayAccess
     /**
      *
      */
-    public function addTag( Helios_Tag $tag )
+    public function addTag( Tag $tag )
     {
         $this->tags[ ] = $tag;
     }

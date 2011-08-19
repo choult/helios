@@ -89,7 +89,7 @@ class Connection
      *
      * @return Helios_Connection
      */
-    public function getInstance( )
+    public static function getInstance( )
     {
         if ( !isset( self::$instance ) )
         {
@@ -106,15 +106,22 @@ class Connection
     {
         $config = $this->getConfig();
         $servers = $config[ 'servers' ];
+        $collapseSVA = ( isset( $config[ 'collapse_single_value_arrays' ] )
+                            && $config[ 'collapse_single_value_arrays' ]
+                            && $config[ 'collapse_single_value_arrays' ] !== 'false' );
 
         foreach ( $servers[ 'readable' ] as $server )
         {
-            $readableServices[ ] = new \Apache_Solr_Service( $server[ 'host' ], $server[ 'port' ], $server[ 'path' ] );
+            $service = new \Apache_Solr_Service( $server[ 'host' ], $server[ 'port' ], $server[ 'path' ] );
+            $service->setCollapseSingleValueArrays( $collapseSVA );
+            $readableServices[ ] = $service;
         }
 
         foreach ( $servers[ 'writable' ] as $server )
         {
-            $writeableServices[ ] = new \Apache_Solr_Service( $server[ 'host' ], $server[ 'port' ], $server[ 'path' ] );
+            $service = new \Apache_Solr_Service( $server[ 'host' ], $server[ 'port' ], $server[ 'path' ] );
+            $service->setCollapseSingleValueArrays( $collapseSVA );
+            $writeableServices[ ] = $service;
         }
 
         $this->service = new \Apache_Solr_Service_Balancer( $readableServices, $writeableServices );

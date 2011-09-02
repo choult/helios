@@ -843,4 +843,107 @@ class HQL
         return ( $page > 0 ) ? $page : 1 ;
     }
 
+    /**
+     * Constructs a complex query part for the given $fieldName
+     *
+     * The array $terms should be either an array or a deep array
+     * Each time the depth increases, the operator between the parts changes (this behaviour may be flipped by employing the $and parameter)
+     *
+     * For example:
+     *
+     *   complexWhere( 'field', array( 'a', 'b', array( 'c', array( 'd', 'e' ) ), 'f' ) )
+     *
+     * would return a query part equivalent to:
+     *
+     *   (field:"a" AND field:"b" AND (field:"c" OR (field:"d" AND field"e")) OR field:"f")
+     *
+     * @param string $fieldName
+     * @param array $terms An array of terms
+     * @param boolean $and Defaults to true
+     */
+    public function complexWhere( $fieldName, $terms, $and = true )
+    {
+        list( $where, $params ) = $this->_complexWhere( $fieldName, $terms, $and );
+        if ( count( $params ) )
+        {
+            $this->where( $where, $params );
+        }
+    }
+
+    /**
+     * Appends a complex query part, using an AND operator
+     *
+     * @see Hql::complexWhere
+     *
+     * @param string $fieldName
+     * @param array $terms
+     * @param boolean $and Defaults to true
+     */
+    public function andComplexWhere( $fieldName, $terms, $and = true )
+    {
+        list( $where, $params ) = $this->_complexWhere( $fieldName, $terms, $and );
+        if ( count( $params ) )
+        {
+            $this->andWhere( $where, $params );
+        }
+    }
+
+    /**
+     * Appends a complex query part, using an OR operator
+     *
+     * @see Hql::complexWhere
+     *
+     * @param string $fieldName
+     * @param array $terms
+     * @param boolean $and Defaults to true
+     */
+    public function orComplexWhere( $fieldName, $terms, $and = true )
+    {
+        list( $where, $params ) = $this->_complexWhere( $fieldName, $terms, $and );
+        if ( count( $params ) )
+        {
+            $this->orWhere( $where, $params );
+        }
+    }
+
+    /**
+     * The internal mechanism for generating a complex query part
+     *
+     * @see Hql::complexWhere
+     *
+     * @param string $fieldName
+     * @param array $terms
+     * @param boolean $and
+     *
+     * @return array An array in two parts, the first is the query, the second a flattened list of parameters
+     */
+    private function _complexWhere( $fieldName, array $terms, $and )
+    {
+        $operator = ( $and ) ? 'AND' : 'OR';
+
+        $where = '';
+
+        $params = array();
+
+        foreach ( $terms as $term )
+        {
+            $where .= ( $where ) ? " $operator " : '';
+            if ( is_array( $term ) )
+            {
+                list( $subwhere, $subparams ) = $this->_complexWhere( $fieldName, $term, !$and );
+                $where .= $subwhere;
+                $params = array_merge( $params, $subparams );
+            }
+            else
+            {
+                $where .= "$fieldName = ?";
+                $params[] = $term;
+            }
+        }
+
+        $where = "($where)";
+
+        return array( $where, $params );
+    }
+
 }

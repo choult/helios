@@ -409,4 +409,54 @@ class HQLTest extends \PHPUnit_Framework_TestCase
         $params = $this->object->params();
         $this->assertEquals( '(name:"solr" AND version:"3.3") OR (version:"4.0")', $params['group.query'] );
     }
+
+    public function testComplexWhere()
+    {
+        $terms = array( "a", "b", array( "c", "d" ), "e" );
+
+        $this->object->complexWhere( 'field', $terms );
+        $this->assertEquals( '((field:"a" AND field:"b" AND (field:"c" OR field:"d") AND field:"e"))', $this->object->build() );
+
+        $this->object->complexWhere( 'field', $terms, false );
+        $this->assertEquals( '((field:"a" OR field:"b" OR (field:"c" AND field:"d") OR field:"e"))', $this->object->build() );
+
+
+        $hql = new Hql();
+        $hql->complexWhere( 'field', array(), false );
+        $this->assertEquals( '', $hql->build() );
+    }
+
+    public function testOrComplexWhere()
+    {
+        $terms = array( "a", "b", array( "c", "d" ), "e" );
+
+        $this->object->where( 'field2 = ?', 'test' );
+        $this->object->orComplexWhere( 'field', $terms );
+        $this->assertEquals( '(field2:"test") OR ((field:"a" AND field:"b" AND (field:"c" OR field:"d") AND field:"e"))', $this->object->build() );
+
+        $this->object->where( 'field2 = ?', 'test' );
+        $this->object->orComplexWhere( 'field', $terms, false );
+        $this->assertEquals( '(field2:"test") OR ((field:"a" OR field:"b" OR (field:"c" AND field:"d") OR field:"e"))', $this->object->build() );
+
+        $this->object->where( 'field2 = ?', 'test' );
+        $this->object->orComplexWhere( 'field', array() );
+        $this->assertEquals( '(field2:"test")', $this->object->build() );
+    }
+
+    public function testAndComplexWhere()
+    {
+        $terms = array( "a", "b", array( "c", "d" ), "e" );
+
+        $this->object->where( 'field2 = ?', 'test' );
+        $this->object->andComplexWhere( 'field', $terms );
+        $this->assertEquals( '(field2:"test") AND ((field:"a" AND field:"b" AND (field:"c" OR field:"d") AND field:"e"))', $this->object->build() );
+
+        $this->object->where( 'field2 = ?', 'test' );
+        $this->object->andComplexWhere( 'field', $terms, false );
+        $this->assertEquals( '(field2:"test") AND ((field:"a" OR field:"b" OR (field:"c" AND field:"d") OR field:"e"))', $this->object->build() );
+
+        $this->object->where( 'field2 = ?', 'test' );
+        $this->object->andComplexWhere( 'field', array() );
+        $this->assertEquals( '(field2:"test")', $this->object->build() );
+    }
 }

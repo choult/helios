@@ -202,6 +202,9 @@ class HQL
         // replace not equal
         $where = preg_replace( '/([\w\d-_]*)\s?!=\s?\?/', '(*:* -$1:"?")', $where );
 
+        // replace to
+        $where = preg_replace( '/([\w\d-_]*)\s?=\s?\? TO ?\?/', '$1:["?" TO "?"]', $where );
+
         // replace equal
         $where = preg_replace( '/([\w\d-_]*)\s?=\s?\?/', '$1:"?"', $where );
 

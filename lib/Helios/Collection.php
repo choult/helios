@@ -212,6 +212,11 @@ class Collection
     {
         if( null === $this->getRequest() ) return null;
 
+        if( $this->getRequest()->getLimit( ) == 0 )
+        {
+            return 1;
+        }
+
         $page = ( $this->getRequest()->getOffset( ) / $this->getRequest()->getLimit( ) ) + 1;
 
         return ( $page > 0 ) ? $page : 1;
@@ -228,7 +233,12 @@ class Collection
 
         $limit = $this->getPageSize( );
         $totalResults = $this->getNumRecords();
-
+        
+        //Division by zero
+        if( $limit == 0 )
+        {
+            return 0;
+        }
         return ceil( $totalResults / $limit );
     }
 

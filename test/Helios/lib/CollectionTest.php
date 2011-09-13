@@ -173,6 +173,10 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals( $this->object->getPageSize(), $request->getLimit() );
         $this->assertEquals( $this->object->getCurrentPage(), $request->getCurrentPage() );
         $this->assertEquals( $this->object->getNumRecords(), 0 );
+
+        /* Division by zero */
+        $request->setLimit( 0 );
+        $this->assertEquals( $this->object->getPageCount(), 0 );
     }
 
     public function testAreRecordsGrouped()

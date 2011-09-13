@@ -26,8 +26,6 @@
  * @version 0.1
  *
  */
-
-
 /**
  * Collection
  *
@@ -88,7 +86,7 @@ class Collection
      *
      * @return Request
      */
-    public function getRequest( )
+    public function getRequest()
     {
         return $this->request;
     }
@@ -106,7 +104,7 @@ class Collection
      *
      * @return Apache_Solr_Response
      */
-    public function getResponse( )
+    public function getResponse()
     {
         return $this->response;
     }
@@ -125,7 +123,7 @@ class Collection
      *
      * @return array When group query hydrated, it would be array( n => array( docs, .. ) ). Otherwise it would be array( docs, ...)
      */
-    public function getRecords( )
+    public function getRecords()
     {
         return $this->records;
     }
@@ -143,7 +141,7 @@ class Collection
      *
      * @return array
      */
-    public function getFacetFields( )
+    public function getFacetFields()
     {
         return $this->facetFields;
     }
@@ -161,7 +159,7 @@ class Collection
      *
      * @return array
      */
-    public function getFacetQueries( )
+    public function getFacetQueries()
     {
         return $this->facetQueries;
     }
@@ -179,7 +177,7 @@ class Collection
      *
      * @return array
      */
-    public function getFacetDates( )
+    public function getFacetDates()
     {
         return $this->facetDates;
     }
@@ -197,27 +195,29 @@ class Collection
      * Pagination: Get result limit
      * @return integer
      */
-    public function getPageSize( )
+    public function getPageSize()
     {
-        if( null === $this->getRequest() ) return 0;
+        if ( null === $this->getRequest() )
+            return 0;
 
-        return $this->getRequest()->getLimit( );
+        return $this->getRequest()->getLimit();
     }
 
     /**
      * Pagination: Get current page
      * @return integer
      */
-    public function getCurrentPage( )
+    public function getCurrentPage()
     {
-        if( null === $this->getRequest() ) return null;
+        if ( null === $this->getRequest() )
+            return null;
 
-        if( $this->getRequest()->getLimit( ) == 0 )
+        if ( $this->getRequest()->getLimit() == 0 )
         {
             return 1;
         }
 
-        $page = ( $this->getRequest()->getOffset( ) / $this->getRequest()->getLimit( ) ) + 1;
+        $page = ( $this->getRequest()->getOffset() / $this->getRequest()->getLimit() ) + 1;
 
         return ( $page > 0 ) ? $page : 1;
     }
@@ -229,13 +229,14 @@ class Collection
      */
     public function getPageCount()
     {
-        if( null === $this->getRequest() ) return null;
+        if ( null === $this->getRequest() )
+            return null;
 
-        $limit = $this->getPageSize( );
+        $limit = $this->getPageSize();
         $totalResults = $this->getNumRecords();
-        
+
         //Division by zero
-        if( $limit == 0 )
+        if ( $limit == 0 )
         {
             return 0;
         }
@@ -246,7 +247,7 @@ class Collection
      * Pagibnation: Get Total results count
      * @return integer
      */
-    public function getNumRecords( )
+    public function getNumRecords()
     {
         return $this->numRecords;
     }
@@ -260,7 +261,6 @@ class Collection
     {
         $this->numRecords = $recordsCount;
     }
-
 
     /**
      * Get Facet ranges
@@ -280,7 +280,6 @@ class Collection
     {
         $this->facetRanges = $facetRanges;
     }
-
 
     /**
      * Get are records groupped

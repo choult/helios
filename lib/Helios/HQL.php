@@ -936,7 +936,15 @@ class HQL
             }
             else
             {
-                $where .= "$fieldName = ?";
+                if ( preg_match( '/^!(.+)$/', $term, $matches ) )
+                {
+                    $term = $matches[ 1 ];
+                    $where .= "$fieldName != ?";
+                }
+                else
+                {
+                    $where .= "$fieldName = ?";
+                }
                 $params[] = $term;
             }
         }
